@@ -454,6 +454,23 @@ prototype pollution and ReDoS advisories.
 - Keep `SECURITY.md`, `CONTRIBUTING.md`, `CHANGELOG.md` and `README.md`
   included in the package tarball.
 
+### 9. License compliance documentation TODO
+
+- [ ] Add a root `NOTICE` or `THIRD_PARTY_NOTICES.md` file for stronger public
+  package auditability.
+- [ ] Explicitly state that the fork is based on SheetJS Community Edition and
+  that original SheetJS copyrights belong to SheetJS LLC.
+- [ ] Document that Stackline maintains the security hardening and downstream
+  release changes.
+- [ ] Mention included Apache-2.0 SheetJS components such as `codepage` /
+  `cpexcel` where applicable.
+- [ ] Include the notice file in `package.json#files` so it ships in the npm
+  tarball.
+- [ ] Link the notice file from the README license section and public docs
+  footer.
+- [ ] Re-run `npm pack --dry-run` and confirm `LICENSE`, `dist/LICENSE` and the
+  new notice file are included.
+
 ## Commands Worth Remembering
 
 ```bash
