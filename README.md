@@ -34,6 +34,7 @@ including Angular applications that currently depend on `xlsx`.
 | Package | `@stackline/xlsx@1.0.0` |
 | API target | `xlsx@0.20.2` |
 | Runtime dependencies | none |
+| Supported Node.js | `>=20` |
 | Types | `types/index.d.ts` |
 | Module entry | `xlsx.mjs` |
 | CommonJS entry | `xlsx.js` |

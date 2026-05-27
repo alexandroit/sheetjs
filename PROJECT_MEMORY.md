@@ -106,6 +106,15 @@ npm install @stackline/xlsx xlsx@npm:@stackline/xlsx --registry http://localhost
 ```text
 https://github.com/alexandroit/sheetjs/tree/stackline-secure
 ```
+- Modernized GitHub Actions after the first public CI failures:
+  - CI uses the pinned `test_files.zip` fixtures from `make init` and no longer
+    tries to refresh optional external fixture repos during push checks.
+  - Bun uses the maintained `make test-bun_misc` target.
+  - Deno tests no longer depend on an unpinned remote base64 helper.
+  - Required Node CI targets supported Node.js releases: `20.x`, `22.x` and
+    `24.x`.
+  - Node `0.x` and `io.js` workflows are manual only because scoped public npm
+    packages and current dev tooling are not compatible with those runtimes.
 
 ## Current Round
 

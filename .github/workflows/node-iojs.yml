@@ -1,6 +1,7 @@
 name: 'Tests: node.js (io.js)'
 
-on: [pull_request, push]
+on:
+  workflow_dispatch:
 
 jobs:
   matrix:
