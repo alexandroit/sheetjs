@@ -17,4 +17,4 @@ jobs:
       - run: sudo chmod a+x /usr/bin/rooster
       - run: make init
       - run: 'echo "Using pinned test_files.zip fixtures; skipping optional live fixture refresh"'
-      - run: 'env FMTS=misc bun hotcross.mjs'
+      - run: make test-bun_misc
