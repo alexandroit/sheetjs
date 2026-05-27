@@ -119,7 +119,7 @@ https://github.com/alexandroit/sheetjs/tree/github
 ## Current Round
 
 - Published `@stackline/xlsx@1.0.0` to the official npm registry.
-- Prepared `@stackline/xlsx@1.0.1` as the next public release after CI
+- Published `@stackline/xlsx@1.0.1` to the official npm registry after CI
   modernization and single-branch cleanup.
 - Replaced Verdaccio `1.0.0` with the public-ready tarball and tagged it as
   `latest`.
@@ -161,6 +161,18 @@ npm install xlsx@npm:@stackline/xlsx
     - `Tests: Bun`: passed
     - `Tests: deno 1.x`: passed
     - `Tests: node.js`: passed
+  - `@stackline/xlsx@1.0.1` release validation:
+    - local `npm run build`: passed
+    - local `PATH="$PWD/node_modules/.bin:$PATH" make dist`: passed
+    - local `make mdlint`: passed
+    - local `npm test`: `37346 passing`, `1 pending`
+    - local `npm pack --dry-run`: passed
+    - GitHub Actions on `github` at commit `738cb9a`: passed
+    - official npm publish: `@stackline/xlsx@1.0.1`
+    - official npm `latest`: `1.0.1`
+    - official npm direct and alias smoke install: passed
+    - consumer `npm audit --omit=dev`: `0 vulnerabilities`
+    - public docs synced to `https://alexandro.net/docs/vanilla/xlsx/`
 
 ## Public Release Decision
 
