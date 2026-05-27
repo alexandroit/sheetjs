@@ -42,7 +42,7 @@ import * as XLSX from 'xlsx';
 - Working branch: `github`
 - Base: SheetJS Community Edition `v0.20.2`
 - Public npm target version: `1.0.2`
-- Verdaccio `latest`: `1.0.0`
+- Verdaccio `latest`: `1.0.2`
 - Official npm `latest`: `1.0.2`
 - Package name: `@stackline/xlsx`
 - Current security scope:
@@ -67,7 +67,7 @@ import * as XLSX from 'xlsx';
 - Published `@stackline/xlsx@1.0.1` to Verdaccio during internal polishing.
 - Replaced the internal Verdaccio `@stackline/xlsx@1.0.0` tarball with the
   public-ready `1.0.0` tarball after removing the old Verdaccio-only metadata.
-- Confirmed Verdaccio `latest` points to `1.0.0`.
+- Confirmed Verdaccio `latest` points to `1.0.2`.
 - Staged alexandro.net docs at:
 
 ```bash
@@ -121,8 +121,10 @@ https://github.com/alexandroit/sheetjs/tree/github
 - Published `@stackline/xlsx@1.0.0` to the official npm registry.
 - Published `@stackline/xlsx@1.0.1` to the official npm registry after CI
   modernization and single-branch cleanup.
-- Replaced Verdaccio `1.0.0` with the public-ready tarball and tagged it as
-  `latest`.
+- Published `@stackline/xlsx@1.0.2` to the official npm registry after fixing
+  the public Apache-2.0 license links in README and docs.
+- Verified Verdaccio resolves `@stackline/xlsx@1.0.2` and exposes `latest:
+  1.0.2`.
 - Keep the primary Verdaccio install experience as:
 
 ```bash
@@ -171,6 +173,22 @@ npm install xlsx@npm:@stackline/xlsx
     - official npm publish: `@stackline/xlsx@1.0.1`
     - official npm `latest`: `1.0.1`
     - official npm direct and alias smoke install: passed
+    - consumer `npm audit --omit=dev`: `0 vulnerabilities`
+    - public docs synced to `https://alexandro.net/docs/vanilla/xlsx/`
+  - `@stackline/xlsx@1.0.2` release validation:
+    - fixed README badge/license links to
+      `https://github.com/alexandroit/sheetjs/blob/github/LICENSE`
+    - local `npm run build`: passed
+    - local `PATH="$PWD/node_modules/.bin:$PATH" make dist`: passed
+    - local `make mdlint`: passed
+    - local `npm test`: `37346 passing`, `1 pending`
+    - local `npm pack --dry-run`: passed
+    - GitHub Actions on `github` at commit `962740e`: passed
+    - official npm publish: `@stackline/xlsx@1.0.2`
+    - official npm `latest`: `1.0.2`
+    - official npm direct and alias smoke install: passed
+    - Verdaccio `latest`: `1.0.2`
+    - Verdaccio direct and alias smoke install: passed
     - consumer `npm audit --omit=dev`: `0 vulnerabilities`
     - public docs synced to `https://alexandro.net/docs/vanilla/xlsx/`
 
