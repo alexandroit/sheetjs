@@ -9,8 +9,7 @@ declare type EmptyFunc = (() => void) | null;
 declare var afterEach:(test:EmptyFunc)=>void;
 declare var cptable: any;
 */
-import * as assert_ from 'https://deno.land/std/testing/asserts.ts';
-import * as base64_ from 'https://deno.land/std/encoding/base64.ts';
+import * as assert_ from 'https://deno.land/std@0.224.0/testing/asserts.ts';
 const assert: any = {...assert_};
 assert.throws = function(f: () => void) { assert.assertThrows(function() { try { f(); } catch(e) { throw e instanceof Error ? e : new Error(e); }})};
 assert.doesNotThrow = function(f: ()=>void) { f(); };
@@ -28,6 +27,11 @@ var DIF_XL = true;
 type BSEncoding = 'utf-8' | 'binary' | 'base64';
 type BFEncoding = 'buffer';
 type ShEncoding = BSEncoding | BFEncoding;
+function encodeBase64Data(u8: Uint8Array): string {
+	let out = "";
+	for(var i = 0; i < u8.length; i += 0x8000) out += String.fromCharCode(...u8.subarray(i, i + 0x8000));
+	return btoa(out);
+}
 function readFileSync2(x: string): Uint8Array;
 function readFileSync2(x: string, e: BSEncoding): string;
 function readFileSync2(x: string, e: BFEncoding): Uint8Array;
@@ -36,7 +40,7 @@ function readFileSync2(x: string, e?: ShEncoding): Uint8Array | string {
 	if(!e) return u8;
 	switch(e) {
 		case 'utf-8': return new TextDecoder().decode(u8);
-		case 'base64': return base64_.encode(u8);
+		case 'base64': return encodeBase64Data(u8);
 		case 'buffer': return u8;
 		case 'binary': return Array.from({length: u8.length}, (_,i) => String.fromCharCode(u8[i])).join("");
 	}
