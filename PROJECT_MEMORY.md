@@ -39,7 +39,7 @@ import * as XLSX from 'xlsx';
 
 - Repository clone: `/storage/data/github/sheetjs-fork/sheetjs`
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
-- Working branch: `stackline-secure`
+- Working branch: `github` (mirrored to `stackline-secure`)
 - Base: SheetJS Community Edition `v0.20.2`
 - Public npm target version: `1.0.0`
 - Verdaccio `latest`: `1.0.0`
@@ -118,8 +118,7 @@ https://github.com/alexandroit/sheetjs/tree/stackline-secure
 
 ## Current Round
 
-- Prepared `@stackline/xlsx@1.0.0` for the official npm release.
-- Did not publish to the official npm registry.
+- Published `@stackline/xlsx@1.0.0` to the official npm registry.
 - Replaced Verdaccio `1.0.0` with the public-ready tarball and tagged it as
   `latest`.
 - Keep the primary Verdaccio install experience as:
@@ -155,6 +154,11 @@ npm install xlsx@npm:@stackline/xlsx
   - official npm tarball URL is available, but packument reads returned 404
     immediately after first publish; treat as npm registry propagation/cache
     until `npm view @stackline/xlsx` returns normally
+  - GitHub Actions on `github` at commit `1a70a90`:
+    - `Tests: pretest/posttest`: passed
+    - `Tests: Bun`: passed
+    - `Tests: deno 1.x`: passed
+    - `Tests: node.js`: passed
 
 ## Public Release Decision
 
