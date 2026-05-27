@@ -39,7 +39,7 @@ import * as XLSX from 'xlsx';
 
 - Repository clone: `/storage/data/github/sheetjs-fork/sheetjs`
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
-- Working branch: `github` (mirrored to `stackline-secure`)
+- Working branch: `github`
 - Base: SheetJS Community Edition `v0.20.2`
 - Public npm target version: `1.0.0`
 - Verdaccio `latest`: `1.0.0`
@@ -101,10 +101,10 @@ rsync -az --delete --rsync-path='sudo rsync' \
 ```bash
 npm install @stackline/xlsx xlsx@npm:@stackline/xlsx --registry http://localhost:4873
 ```
-- Pushed branch `stackline-secure` to GitHub:
+- Pushed the principal branch `github` to GitHub:
 
 ```text
-https://github.com/alexandroit/sheetjs/tree/stackline-secure
+https://github.com/alexandroit/sheetjs/tree/github
 ```
 - Modernized GitHub Actions after the first public CI failures:
   - CI uses the pinned `test_files.zip` fixtures from `make init` and no longer
