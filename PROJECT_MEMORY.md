@@ -73,10 +73,25 @@ import * as XLSX from 'xlsx';
 /storage/data/build/alexandro.net-docs/vanilla/xlsx/
 ```
 
+- Copied the staged static docs to the local Apache docs tree:
+
+```bash
+/var/www/html/alexandro.net_docs/vanilla/xlsx/
+```
+
+- Public `https://alexandro.net/docs/vanilla/xlsx/` still returned HTTP 404
+  through Cloudflare on May 27, 2026, even though existing docs such as
+  `/docs/vanilla/color/` returned 200. Treat that as an origin/deploy sync issue
+  outside this repo, not a missing local docs file.
 - Confirmed current direct and alias install from Verdaccio with:
 
 ```bash
 npm install @stackline/xlsx xlsx@npm:@stackline/xlsx --registry http://localhost:4873
+```
+- Pushed branch `stackline-secure` to GitHub:
+
+```text
+https://github.com/alexandroit/sheetjs/tree/stackline-secure
 ```
 
 ## Current Round
@@ -113,6 +128,8 @@ npm install xlsx@npm:@stackline/xlsx
   - local tarball install smoke: passed
   - Verdaccio direct and alias smoke: passed
   - consumer `npm audit --omit=dev`: `0 vulnerabilities`
+  - official npm registry check: `@stackline/xlsx` returned 404, so it was not
+    published there
 
 ## Public Release Decision
 
