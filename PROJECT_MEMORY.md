@@ -43,6 +43,7 @@ import * as XLSX from 'xlsx';
 - Base: SheetJS Community Edition `v0.20.2`
 - Public npm target version: `1.0.0`
 - Verdaccio `latest`: `1.0.0`
+- Official npm `latest`: `1.0.0`
 - Package name: `@stackline/xlsx`
 - Current security scope:
   - GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533
@@ -83,6 +84,18 @@ import * as XLSX from 'xlsx';
   through Cloudflare on May 27, 2026, even though existing docs such as
   `/docs/vanilla/color/` returned 200. Treat that as an origin/deploy sync issue
   outside this repo, not a missing local docs file.
+- Resolution: the public site serves docs from `codex-server`, not this local
+  machine. Sync the docs with:
+
+```bash
+ssh codex-server 'sudo mkdir -p /var/www/html/alexandro.net_docs/vanilla/xlsx'
+rsync -az --delete --rsync-path='sudo rsync' \
+  /storage/data/build/alexandro.net-docs/vanilla/xlsx/ \
+  codex-server:/var/www/html/alexandro.net_docs/vanilla/xlsx/
+```
+
+- After syncing to `codex-server`, `https://alexandro.net/docs/vanilla/xlsx/`
+  returned HTTP 200.
 - Confirmed current direct and alias install from Verdaccio with:
 
 ```bash
@@ -128,8 +141,11 @@ npm install xlsx@npm:@stackline/xlsx
   - local tarball install smoke: passed
   - Verdaccio direct and alias smoke: passed
   - consumer `npm audit --omit=dev`: `0 vulnerabilities`
-  - official npm registry check: `@stackline/xlsx` returned 404, so it was not
-    published there
+  - official npm publish: `npm publish --access public --registry https://registry.npmjs.org/`
+  - official npm access state: `@stackline/xlsx` is public with `latest: 1.0.0`
+  - official npm tarball URL is available, but packument reads returned 404
+    immediately after first publish; treat as npm registry propagation/cache
+    until `npm view @stackline/xlsx` returns normally
 
 ## Public Release Decision
 

@@ -7,6 +7,7 @@ security hardening for spreadsheet parsing and conversion workflows.
 
 | Version | Supported |
 |:--- |:--- |
+| `1.0.x` | Yes |
 | `0.20.2-stackline.x` | Yes |
 | Older Stackline prereleases | No |
 | Upstream `xlsx` releases | See the upstream project |

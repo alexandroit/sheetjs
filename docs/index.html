@@ -129,9 +129,10 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
           <article>
             <h3>Prototype pollution</h3>
             <p>
-              Parser and conversion paths reject or ignore `__proto__`,
-              `prototype` and `constructor` where untrusted input can become an
-              object key.
+              Parser and conversion paths reject or ignore
+              <code>__proto__</code>, <code>prototype</code> and
+              <code>constructor</code> where untrusted input can become an object
+              key.
             </p>
           </article>
           <article>
@@ -182,11 +183,12 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
           <h2>Public release checklist.</h2>
         </div>
         <ul class="checklist">
-          <li>Run `npm ci`.</li>
-          <li>Run `npm test`.</li>
-          <li>Run `npm run build`.</li>
-          <li>Run `make dist`.</li>
-          <li>Run `npm pack --dry-run`.</li>
+          <li>Published as <code>@stackline/xlsx@1.0.0</code> on npm.</li>
+          <li>Run <code>npm ci</code>.</li>
+          <li>Run <code>npm test</code>.</li>
+          <li>Run <code>npm run build</code>.</li>
+          <li>Run <code>make dist</code>.</li>
+          <li>Run <code>npm pack --dry-run</code>.</li>
           <li>Smoke test direct scoped usage and npm alias migration.</li>
         </ul>
       </section>
