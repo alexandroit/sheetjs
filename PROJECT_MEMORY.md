@@ -41,9 +41,9 @@ import * as XLSX from 'xlsx';
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
 - Working branch: `github`
 - Base: SheetJS Community Edition `v0.20.2`
-- Public npm target version: `1.0.0`
+- Public npm target version: `1.0.1`
 - Verdaccio `latest`: `1.0.0`
-- Official npm `latest`: `1.0.0`
+- Official npm `latest`: `1.0.1`
 - Package name: `@stackline/xlsx`
 - Current security scope:
   - GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533
@@ -119,6 +119,8 @@ https://github.com/alexandroit/sheetjs/tree/github
 ## Current Round
 
 - Published `@stackline/xlsx@1.0.0` to the official npm registry.
+- Prepared `@stackline/xlsx@1.0.1` as the next public release after CI
+  modernization and single-branch cleanup.
 - Replaced Verdaccio `1.0.0` with the public-ready tarball and tagged it as
   `latest`.
 - Keep the primary Verdaccio install experience as:

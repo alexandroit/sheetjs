@@ -4,6 +4,21 @@ This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.
 
+## v1.0.1
+
+* Modernized the public GitHub Actions release checks for supported Node.js
+  versions (`20.x`, `22.x` and `24.x`).
+* Kept legacy Node `0.x` and `io.js` checks available as manual workflows
+  because scoped public npm packages and current dev tooling no longer support
+  those runtimes.
+* Stabilized Deno tests by pinning remote standard-library imports and using a
+  local base64 helper in the test harness.
+* Updated Bun tests to use the maintained Makefile target.
+* Stopped push checks from refreshing optional external fixture repositories
+  that are no longer reliable; CI now uses the pinned fixture archive.
+* Removed the temporary `stackline-secure` branch and kept `github` as the
+  only principal branch.
+
 ## v1.0.0
 
 * Established the public Stackline package line as `@stackline/xlsx@1.0.0`.
