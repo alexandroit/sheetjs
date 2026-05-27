@@ -41,9 +41,9 @@ import * as XLSX from 'xlsx';
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
 - Working branch: `github`
 - Base: SheetJS Community Edition `v0.20.2`
-- Public npm target version: `1.0.1`
+- Public npm target version: `1.0.2`
 - Verdaccio `latest`: `1.0.0`
-- Official npm `latest`: `1.0.1`
+- Official npm `latest`: `1.0.2`
 - Package name: `@stackline/xlsx`
 - Current security scope:
   - GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533

@@ -4,6 +4,13 @@ This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.
 
+## v1.0.2
+
+* Fixed public README and docs license links to point to the active GitHub
+  branch license file.
+* Added an explicit Apache-2.0 license link in the README license section and
+  public docs footer.
+
 ## v1.0.1
 
 * Modernized the public GitHub Actions release checks for supported Node.js

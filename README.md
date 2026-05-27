@@ -5,7 +5,7 @@
 > `xlsx`.
 
 [![npm version](https://img.shields.io/npm/v/@stackline/xlsx.svg?style=flat-square)](https://www.npmjs.com/package/@stackline/xlsx)
-[![license](https://img.shields.io/npm/l/@stackline/xlsx.svg?style=flat-square)](https://github.com/alexandroit/sheetjs/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/@stackline/xlsx.svg?style=flat-square)](https://github.com/alexandroit/sheetjs/blob/github/LICENSE)
 [![GitHub repository](https://img.shields.io/badge/GitHub-alexandroit%2Fsheetjs-181717?style=flat-square&logo=github)](https://github.com/alexandroit/sheetjs)
 [![Docs](https://img.shields.io/badge/docs-alexandro.net-0f766e?style=flat-square)](https://alexandro.net/docs/vanilla/xlsx/)
 
@@ -14,7 +14,7 @@
 **[Issues](https://github.com/alexandroit/sheetjs/issues)** |
 **[Repository](https://github.com/alexandroit/sheetjs)**
 
-**Public release line:** `1.0.1`
+**Public release line:** `1.0.2`
 
 ---
 
@@ -31,7 +31,7 @@ including Angular applications that currently depend on `xlsx`.
 
 | Item | Value |
 | :--- | :--- |
-| Package | `@stackline/xlsx@1.0.1` |
+| Package | `@stackline/xlsx@1.0.2` |
 | API target | `xlsx@0.20.2` |
 | Runtime dependencies | none |
 | Supported Node.js | `>=20` |
@@ -213,6 +213,7 @@ It validates direct scoped imports, `xlsx` alias migration and ESM usage.
 
 ## License
 
-Apache-2.0. This project is a maintained fork of SheetJS Community Edition.
-The original SheetJS copyright and license notices are preserved in the source
-tree and distribution files.
+[Apache-2.0](https://github.com/alexandroit/sheetjs/blob/github/LICENSE).
+This project is a maintained fork of SheetJS Community Edition. The original
+SheetJS copyright and license notices are preserved in the source tree and
+distribution files.
