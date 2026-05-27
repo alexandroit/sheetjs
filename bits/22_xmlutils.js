@@ -4,7 +4,7 @@ var tagregex1=/<[\/\?]?[a-zA-Z0-9:_-]+(?:\s+[^"\s?<>\/]+\s*=\s*(?:"[^"]*"|'[^']*
 var tagregex = /*#__PURE__*/XML_HEADER.match(tagregex1) ? tagregex1 : tagregex2;
 var nsregex=/<\w*:/, nsregex2 = /<(\/?)\w+:/;
 function parsexmltag(tag/*:string*/, skip_root/*:?boolean*/, skip_LC/*:?boolean*/)/*:any*/ {
-	var z = ({}/*:any*/);
+	var z = safe_obj();
 	var eq = 0, c = 0;
 	for(; eq !== tag.length; ++eq) if((c = tag.charCodeAt(eq)) === 32 || c === 10 || c === 13) break;
 	if(!skip_root) z[0] = tag.slice(0, eq);
@@ -20,14 +20,14 @@ function parsexmltag(tag/*:string*/, skip_root/*:?boolean*/, skip_LC/*:?boolean*
 		for(j=0;j!=q.length;++j) if(q.charCodeAt(j) === 58) break;
 		if(j===q.length) {
 			if(q.indexOf("_") > 0) q = q.slice(0, q.indexOf("_")); // from ods
-			z[q] = v;
-			if(!skip_LC) z[q.toLowerCase()] = v;
+			if(!safe_set_obj(z, q, v)) continue;
+			if(!skip_LC) safe_set_obj(z, q.toLowerCase(), v);
 		}
 		else {
 			var k = (j===5 && q.slice(0,5)==="xmlns"?"xmlns":"")+q.slice(j+1);
 			if(z[k] && q.slice(j-3,j) == "ext") continue; // from ods
-			z[k] = v;
-			if(!skip_LC) z[k.toLowerCase()] = v;
+			if(!safe_set_obj(z, k, v)) continue;
+			if(!skip_LC) safe_set_obj(z, k.toLowerCase(), v);
 		}
 	}
 	return z;

@@ -4,7 +4,7 @@
 /*global global, exports, module, require:false, process:false, Buffer:false, ArrayBuffer:false, DataView:false, Deno:false, Set:false, Float32Array:false */
 var XLSX = {};
 function make_xlsx_lib(XLSX){
-XLSX.version = '0.20.2';
+XLSX.version = '1.0.0';
 var current_codepage = 1200, current_ansi = 1252;
 /*global cptable:true, window */
 var $cptable;
@@ -158,9 +158,9 @@ function Base64_decode(input) {
   var o = "";
   var c1 = 0, c2 = 0, c3 = 0, e1 = 0, e2 = 0, e3 = 0, e4 = 0;
   if (input.slice(0, 5) == "data:") {
-    var i = input.slice(0, 1024).indexOf(";base64,");
-    if (i > -1)
-      input = input.slice(i + 8);
+    var dataidx = input.slice(0, 1024).indexOf(";base64,");
+    if (dataidx > -1)
+      input = input.slice(dataidx + 8);
   }
   input = input.replace(/[^\w\+\/\=]/g, "");
   for (var i = 0; i < input.length; ) {
@@ -3223,7 +3223,7 @@ function blobify(data) {
 }
 /* write or download file */
 function write_dl(fname, payload, enc) {
-	/*global IE_SaveFile, Blob, navigator, saveAs, document, File, chrome */
+	/*global IE_SaveFile, navigator, saveAs, document, chrome */
 	if(typeof _fs !== 'undefined' && _fs.writeFileSync) return enc ? _fs.writeFileSync(fname, payload, enc) : _fs.writeFileSync(fname, payload);
 	if(typeof Deno !== 'undefined') {
 		/* in this spot, it's safe to assume typed arrays and TextEncoder/TextDecoder exist */
@@ -3287,6 +3287,28 @@ function keys(o) {
 	var ks = Object.keys(o), o2 = [];
 	for(var i = 0; i < ks.length; ++i) if(Object.prototype.hasOwnProperty.call(o, ks[i])) o2.push(ks[i]);
 	return o2;
+}
+
+function safe_key(k) {
+	return String(k);
+}
+function is_unsafe_key(k) {
+	var s = safe_key(k);
+	return s === "__proto__" || s === "prototype" || s === "constructor";
+}
+function is_proto_key(k) {
+	return is_unsafe_key(k);
+}
+function safe_obj() {
+	return typeof Object.create == "function" ? Object.create(null) : {};
+}
+function safe_has_obj(o, k) {
+	return !is_unsafe_key(k) && Object.prototype.hasOwnProperty.call(o, safe_key(k));
+}
+function safe_set_obj(o, k, v) {
+	if(is_unsafe_key(k)) return false;
+	o[safe_key(k)] = v;
+	return true;
 }
 
 function evert_key(obj, key) {
@@ -3421,11 +3443,10 @@ function cc2str(arr, debomit) {
 }
 
 function dup(o) {
-	if(typeof JSON != 'undefined' && !Array.isArray(o)) return JSON.parse(JSON.stringify(o));
 	if(typeof o != 'object' || o == null) return o;
 	if(o instanceof Date) return new Date(o.getTime());
 	var out = {};
-	for(var k in o) if(Object.prototype.hasOwnProperty.call(o, k)) out[k] = dup(o[k]);
+	for(var k in o) if(safe_has_obj(o, k)) out[k] = dup(o[k]);
 	return out;
 }
 
@@ -3774,7 +3795,7 @@ var tagregex1=/<[\/\?]?[a-zA-Z0-9:_-]+(?:\s+[^"\s?<>\/]+\s*=\s*(?:"[^"]*"|'[^']*
 var tagregex = XML_HEADER.match(tagregex1) ? tagregex1 : tagregex2;
 var nsregex=/<\w*:/, nsregex2 = /<(\/?)\w+:/;
 function parsexmltag(tag, skip_root, skip_LC) {
-	var z = ({});
+	var z = safe_obj();
 	var eq = 0, c = 0;
 	for(; eq !== tag.length; ++eq) if((c = tag.charCodeAt(eq)) === 32 || c === 10 || c === 13) break;
 	if(!skip_root) z[0] = tag.slice(0, eq);
@@ -3790,14 +3811,14 @@ function parsexmltag(tag, skip_root, skip_LC) {
 		for(j=0;j!=q.length;++j) if(q.charCodeAt(j) === 58) break;
 		if(j===q.length) {
 			if(q.indexOf("_") > 0) q = q.slice(0, q.indexOf("_")); // from ods
-			z[q] = v;
-			if(!skip_LC) z[q.toLowerCase()] = v;
+			if(!safe_set_obj(z, q, v)) continue;
+			if(!skip_LC) safe_set_obj(z, q.toLowerCase(), v);
 		}
 		else {
 			var k = (j===5 && q.slice(0,5)==="xmlns"?"xmlns":"")+q.slice(j+1);
 			if(z[k] && q.slice(j-3,j) == "ext") continue; // from ods
-			z[k] = v;
-			if(!skip_LC) z[k.toLowerCase()] = v;
+			if(!safe_set_obj(z, k, v)) continue;
+			if(!skip_LC) safe_set_obj(z, k.toLowerCase(), v);
 		}
 	}
 	return z;
@@ -5294,12 +5315,13 @@ function get_rels_path(file) {
 }
 
 function parse_rels(data, currentFilePath) {
-	var rels = {"!id":{}};
+	var rels = safe_obj();
+	rels["!id"] = safe_obj();
 	if (!data) return rels;
 	if (currentFilePath.charAt(0) !== '/') {
 		currentFilePath = '/'+currentFilePath;
 	}
-	var hash = {};
+	var hash = safe_obj();
 
 	(data.match(tagregex)||[]).forEach(function(x) {
 		var y = parsexmltag(x);
@@ -5307,8 +5329,8 @@ function parse_rels(data, currentFilePath) {
 		if (y[0] === '<Relationship') {
 			var rel = {}; rel.Type = y.Type; rel.Target = unescapexml(y.Target); rel.Id = y.Id; if(y.TargetMode) rel.TargetMode = y.TargetMode;
 			var canonictarget = y.TargetMode === 'External' ? y.Target : resolve_path(y.Target, currentFilePath);
-			rels[canonictarget] = rel;
-			hash[y.Id] = rel;
+			safe_set_obj(rels, canonictarget, rel);
+			safe_set_obj(hash, y.Id, rel);
 		}
 	});
 	rels["!id"] = hash;
@@ -5331,7 +5353,7 @@ function write_rels(rels) {
 
 function add_rels(rels, rId, f, type, relobj, targetmode) {
 	if(!relobj) relobj = {};
-	if(!rels['!id']) rels['!id'] = {};
+	if(!rels['!id']) rels['!id'] = safe_obj();
 	if(!rels['!idx']) rels['!idx'] = 1;
 	if(rId < 0) for(rId = rels['!idx']; rels['!id']['rId' + rId]; ++rId){/* empty */}
 	rels['!idx'] = rId + 1;
@@ -5341,8 +5363,8 @@ function add_rels(rels, rId, f, type, relobj, targetmode) {
 	if(targetmode) relobj.TargetMode = targetmode;
 	else if([RELS.HLINK, RELS.XPATH, RELS.XMISS].indexOf(relobj.Type) > -1) relobj.TargetMode = "External";
 	if(rels['!id'][relobj.Id]) throw new Error("Cannot rewrite rId " + rId);
-	rels['!id'][relobj.Id] = relobj;
-	rels[('/' + relobj.Target).replace("//","/")] = relobj;
+	safe_set_obj(rels['!id'], relobj.Id, relobj);
+	safe_set_obj(rels, ('/' + relobj.Target).replace("//","/"), relobj);
 	return rId;
 }
 var CT_ODS = "application/vnd.oasis.opendocument.spreadsheet";
@@ -5592,7 +5614,7 @@ function write_ext_props(cp) {
 /* 15.2.12.2 Custom File Properties Part */
 var custregex = /<[^<>]+>[^<]*/g;
 function parse_cust_props(data, opts) {
-	var p = {}, name = "";
+	var p = safe_obj(), name = "";
 	var m = data.match(custregex);
 	if(m) for(var i = 0; i != m.length; ++i) {
 		var x = m[i], y = parsexmltag(x);
@@ -5601,33 +5623,35 @@ function parse_cust_props(data, opts) {
 			case '<Properties': break;
 			case '<property': name = unescapexml(y.name); break;
 			case '</property>': name = null; break;
-			default: if (x.indexOf('<vt:') === 0) {
+			default: if (x.indexOf('<vt:') === 0 && name != null && !is_unsafe_key(name)) {
 				var toks = x.split('>');
-				var type = toks[0].slice(4), text = toks[1];
+				var type = toks[0].slice(4), text = toks[1], val = null, setval = true;
 				/* 22.4.2.32 (CT_Variant). Omit the binary types from 22.4 (Variant Types) */
 				switch(type) {
 					case 'lpstr': case 'bstr': case 'lpwstr':
-						p[name] = unescapexml(text);
+						val = unescapexml(text);
 						break;
 					case 'bool':
-						p[name] = parsexmlbool(text);
+						val = parsexmlbool(text);
 						break;
 					case 'i1': case 'i2': case 'i4': case 'i8': case 'int': case 'uint':
-						p[name] = parseInt(text, 10);
+						val = parseInt(text, 10);
 						break;
 					case 'r4': case 'r8': case 'decimal':
-						p[name] = parseFloat(text);
+						val = parseFloat(text);
 						break;
 					case 'filetime': case 'date':
-						p[name] = parseDate(text);
+						val = parseDate(text);
 						break;
 					case 'cy': case 'error':
-						p[name] = unescapexml(text);
+						val = unescapexml(text);
 						break;
 					default:
+						setval = false;
 						if(type.slice(-1) == '/') break;
 						if(opts.WTF && typeof console !== 'undefined') console.warn('Unexpected', x, type, toks);
 				}
+				if(setval) safe_set_obj(p, name, val);
 			} else if(x.slice(0,2) === "</") {/* empty */
 			} else if(opts.WTF) throw new Error(x);
 		}
@@ -5642,7 +5666,9 @@ function write_cust_props(cp) {
 	})];
 	if(!cp) return o.join("");
 	var pid = 1;
-	keys(cp).forEach(function custprop(k) { ++pid;
+	keys(cp).forEach(function custprop(k) {
+		if(is_unsafe_key(k)) return;
+		++pid;
 		o[o.length] = (writextag('property', write_vt(cp[k], true), {
 			'fmtid': '{D5CDD505-2E9C-101B-9397-08002B2CF9AE}',
 			'pid': pid,
@@ -9444,6 +9470,7 @@ function check_ws_name(n, safe) {
 	try {
 		if(n == "") throw new Error("Sheet name cannot be blank");
 		if(n.length > 31) throw new Error("Sheet name cannot exceed 31 chars");
+		if(is_proto_key(n)) throw new Error("Sheet name cannot be a reserved object key");
 		if(n.charCodeAt(0) == 0x27 || n.charCodeAt(n.length - 1) == 0x27) throw new Error("Sheet name cannot start or end with apostrophe (')");
 		if(n.toLowerCase() == "history") throw new Error("Sheet name cannot be 'History'");
 		badchars.forEach(function(c) {
@@ -10274,7 +10301,7 @@ function parse_content_xml(d, _opts, _nfm) {
 		var nfidx, NF = "", pidx = 0;
 		var sheetag;
 		var rowtag;
-		var Sheets = {}, SheetNames = [];
+		var Sheets = safe_obj(), SheetNames = [];
 		var ws = ({}); if(opts.dense) ws["!data"] = [];
 		var Rn, q;
 		var ctag = ({value:""});
@@ -10310,8 +10337,11 @@ function parse_content_xml(d, _opts, _nfm) {
 					if(rowinfo.length) ws["!rows"] = rowinfo;
 					sheetag.name = sheetag['名称'] || sheetag.name;
 					if(typeof JSON !== 'undefined') JSON.stringify(sheetag);
-					SheetNames.push(sheetag.name);
-					Sheets[sheetag.name] = ws;
+					if(is_unsafe_key(sheetag.name)) { if(opts.WTF) throw new Error("Bad sheet name: " + sheetag.name); }
+					else {
+						SheetNames.push(sheetag.name);
+						safe_set_obj(Sheets, sheetag.name, ws);
+					}
 					intable = false;
 				}
 				else if(Rn[0].charAt(Rn[0].length-2) !== '/') {
@@ -10822,7 +10852,6 @@ function parse_fods(data, opts) {
 	wb.bookType = "fods";
 	return wb;
 }
-
 /* OpenDocument */
 var write_styles_ods = /* @__PURE__ */(function() {
 	var master_styles = [
@@ -11392,12 +11421,14 @@ function parse_sheet_legacy_drawing(sheet, type, zip, path, idx, opts, wb, comme
 
 function safe_parse_sheet(zip, path, relsPath, sheet, idx, sheetRels, sheets, stype, opts, wb, themes, styles) {
 	try {
-		sheetRels[sheet]=parse_rels(getzipstr(zip, relsPath, true), path);
+		if(is_unsafe_key(sheet)) throw new Error("Bad sheet name: " + sheet);
+		var sheetKey = safe_key(sheet);
+		safe_set_obj(sheetRels, sheetKey, parse_rels(getzipstr(zip, relsPath, true), path));
 		var data = getzipdata(zip, path);
 		var _ws;
 		switch(stype) {
-			case 'sheet':  _ws = parse_ws(data, path, idx, opts, sheetRels[sheet], wb, themes, styles); break;
-			case 'chart':  _ws = parse_cs(data, path, idx, opts, sheetRels[sheet], wb, themes, styles);
+			case 'sheet':  _ws = parse_ws(data, path, idx, opts, sheetRels[sheetKey], wb, themes, styles); break;
+			case 'chart':  _ws = parse_cs(data, path, idx, opts, sheetRels[sheetKey], wb, themes, styles);
 				if(!_ws || !_ws['!drawel']) break;
 				var dfile = resolve_path(_ws['!drawel'].Target, path);
 				var drelsp = get_rels_path(dfile);
@@ -11406,30 +11437,32 @@ function safe_parse_sheet(zip, path, relsPath, sheet, idx, sheetRels, sheets, st
 				var crelsp = get_rels_path(chartp);
 				_ws = parse_chart(getzipstr(zip, chartp, true), chartp, opts, parse_rels(getzipstr(zip, crelsp, true), chartp), wb, _ws);
 				break;
-			case 'macro':  _ws = parse_ms(data, path, idx, opts, sheetRels[sheet], wb, themes, styles); break;
-			case 'dialog': _ws = parse_ds(data, path, idx, opts, sheetRels[sheet], wb, themes, styles); break;
+			case 'macro':  _ws = parse_ms(data, path, idx, opts, sheetRels[sheetKey], wb, themes, styles); break;
+			case 'dialog': _ws = parse_ds(data, path, idx, opts, sheetRels[sheetKey], wb, themes, styles); break;
 			default: throw new Error("Unrecognized sheet type " + stype);
 		}
-		sheets[sheet] = _ws;
+		if(!safe_set_obj(sheets, sheetKey, _ws)) return false;
 
 		/* scan rels for comments and threaded comments */
 		var comments = [], tcomments = [];
-		if(sheetRels && sheetRels[sheet]) keys(sheetRels[sheet]).forEach(function(n) {
+		if(sheetRels && sheetRels[sheetKey]) keys(sheetRels[sheetKey]).forEach(function(n) {
 			var dfile = "";
-			if(sheetRels[sheet][n].Type == RELS.CMNT) {
-				dfile = resolve_path(sheetRels[sheet][n].Target, path);
+			if(sheetRels[sheetKey][n].Type == RELS.CMNT) {
+				dfile = resolve_path(sheetRels[sheetKey][n].Target, path);
 				comments = parse_cmnt(getzipdata(zip, dfile, true), dfile, opts);
 				if(!comments || !comments.length) return;
 				sheet_insert_comments(_ws, comments, false);
 			}
-			if(sheetRels[sheet][n].Type == RELS.TCMNT) {
-				dfile = resolve_path(sheetRels[sheet][n].Target, path);
+			if(sheetRels[sheetKey][n].Type == RELS.TCMNT) {
+				dfile = resolve_path(sheetRels[sheetKey][n].Target, path);
 				tcomments = tcomments.concat(parse_tcmnt_xml(getzipdata(zip, dfile, true), opts));
 			}
 		});
 		if(tcomments && tcomments.length) sheet_insert_comments(_ws, tcomments, true, opts.people || []);
 		parse_sheet_legacy_drawing(_ws, stype, zip, path, idx, opts, wb, comments);
+		return true;
 	} catch(e) { if(opts.WTF) throw e; }
+	return false;
 }
 
 function strip_front_slash(x) { return x.charAt(0) == '/' ? x.slice(1) : x; }
@@ -11485,8 +11518,8 @@ function parse_zip(zip, opts) {
 	}
 	if(dir.workbooks[0].slice(-3) == "bin") xlsb = true;
 
-	var themes = ({});
-	var styles = ({});
+	var themes = safe_obj();
+	var styles = safe_obj();
 	if(!opts.bookSheets && !opts.bookProps) {
 		strs = [];
 		if(dir.sst) try { strs=parse_sst(getzipdata(zip, strip_front_slash(dir.sst)), dir.sst, opts); } catch(e) { if(opts.WTF) throw e; }
@@ -11516,7 +11549,7 @@ function parse_zip(zip, opts) {
 		}
 	}
 
-	var custprops = {};
+	var custprops = safe_obj();
 	if(!opts.bookSheets || opts.bookProps) {
 		if (dir.custprops.length !== 0) {
 			propdata = getzipstr(zip, strip_front_slash(dir.custprops[0]), true);
@@ -11528,17 +11561,22 @@ function parse_zip(zip, opts) {
 	if(opts.bookSheets || opts.bookProps) {
 		if(wb.Sheets) sheets = wb.Sheets.map(function pluck(x){ return x.name; });
 		else if(props.Worksheets && props.SheetNames.length > 0) sheets=props.SheetNames;
+		if(sheets) {
+			var _sheets = [];
+			for(var _si = 0; _si != sheets.length; ++_si) if(!is_unsafe_key(sheets[_si])) _sheets.push(sheets[_si]);
+			sheets = _sheets;
+		}
 		if(opts.bookProps) { out.Props = props; out.Custprops = custprops; }
 		if(opts.bookSheets && typeof sheets !== 'undefined') out.SheetNames = sheets;
 		if(opts.bookSheets ? out.SheetNames : opts.bookProps) return out;
 	}
-	sheets = {};
+	sheets = safe_obj();
 
-	var deps = {};
+	var deps = safe_obj();
 	if(opts.bookDeps && dir.calcchain) deps=parse_cc(getzipdata(zip, strip_front_slash(dir.calcchain)),dir.calcchain,opts);
 
 	var i=0;
-	var sheetRels = ({});
+	var sheetRels = safe_obj();
 	var path, relsPath;
 
 	{
@@ -11569,7 +11607,11 @@ function parse_zip(zip, opts) {
 
 	/* Numbers iOS hack */
 	var nmode = (getzipdata(zip,"xl/worksheets/sheet.xml",true))?1:0;
+	var safeAllSheetNames = [], parsedSheets = [];
 	wsloop: for(i = 0; i != props.Worksheets; ++i) {
+		var sheetName = props.SheetNames[i];
+		if(is_unsafe_key(sheetName)) { if(opts.WTF) throw new Error("Bad sheet name: " + sheetName); continue wsloop; }
+		safeAllSheetNames.push(sheetName);
 		var stype = "sheet";
 		if(wbrels && wbrels[i]) {
 			path = 'xl/' + (wbrels[i][1]).replace(/[\/]?xl\//, "");
@@ -11583,18 +11625,20 @@ function parse_zip(zip, opts) {
 		relsPath = path.replace(/^(.*)(\/)([^\/]*)$/, "$1/_rels/$3.rels");
 		if(opts && opts.sheets != null) switch(typeof opts.sheets) {
 			case "number": if(i != opts.sheets) continue wsloop; break;
-			case "string": if(props.SheetNames[i].toLowerCase() != opts.sheets.toLowerCase()) continue wsloop; break;
+			case "string": if(sheetName.toLowerCase() != opts.sheets.toLowerCase()) continue wsloop; break;
 			default: if(Array.isArray && Array.isArray(opts.sheets)) {
 				var snjseen = false;
 				for(var snj = 0; snj != opts.sheets.length; ++snj) {
 					if(typeof opts.sheets[snj] == "number" && opts.sheets[snj] == i) snjseen=1;
-					if(typeof opts.sheets[snj] == "string" && opts.sheets[snj].toLowerCase() == props.SheetNames[i].toLowerCase()) snjseen = 1;
+					if(typeof opts.sheets[snj] == "string" && opts.sheets[snj].toLowerCase() == sheetName.toLowerCase()) snjseen = 1;
 				}
 				if(!snjseen) continue wsloop;
 			}
 		}
-		safe_parse_sheet(zip, path, relsPath, props.SheetNames[i], i, sheetRels, sheets, stype, opts, wb, themes, styles);
+		if(safe_parse_sheet(zip, path, relsPath, sheetName, i, sheetRels, sheets, stype, opts, wb, themes, styles)) parsedSheets.push(sheetName);
 	}
+	props.SheetNames = safeAllSheetNames;
+	props.Worksheets = safeAllSheetNames.length;
 
 	out = ({
 		Directory: dir,
@@ -11603,7 +11647,7 @@ function parse_zip(zip, opts) {
 		Custprops: custprops,
 		Deps: deps,
 		Sheets: sheets,
-		SheetNames: props.SheetNames,
+		SheetNames: safeAllSheetNames,
 		Strings: strs,
 		Styles: styles,
 		Themes: themes,
@@ -11615,11 +11659,11 @@ function parse_zip(zip, opts) {
 			out.files = zip.files;
 		} else {
 			out.keys = [];
-			out.files = {};
+			out.files = safe_obj();
 			zip.FullPaths.forEach(function(p, idx) {
 				p = p.replace(/^Root Entry[\/]/, "");
 				out.keys.push(p);
-				out.files[p] = zip.FileIndex[idx];
+				safe_set_obj(out.files, p, zip.FileIndex[idx]);
 			});
 		}
 	}
@@ -11675,7 +11719,6 @@ if(einfo[0] == 0x04 && typeof decrypt_agile !== 'undefined') return decrypt_agil
 if(einfo[0] == 0x02 && typeof decrypt_std76 !== 'undefined') return decrypt_std76(einfo[1], data.content, opts.password || "", opts);
 	throw new Error("File is password-protected");
 }
-
 function write_zip_xlsb(wb, opts) {
 	if(wb && !wb.SSF) {
 		wb.SSF = dup(table_fmt);
@@ -12321,7 +12364,7 @@ function make_json_row(sheet, r, R, cols, header, hdr, o) {
 	var rr = encode_row(R);
 	var defval = o.defval, raw = o.raw || !Object.prototype.hasOwnProperty.call(o, "raw");
 	var isempty = true, dense = (sheet["!data"] != null);
-	var row = (header === 1) ? [] : {};
+	var row = (header === 1) ? [] : safe_obj();
 	if(header !== 1) {
 		if(Object.defineProperty) try { Object.defineProperty(row, '__rowNum__', {value:R, enumerable:false}); } catch(e) { row.__rowNum__ = R; }
 		else row.__rowNum__ = R;
@@ -12330,7 +12373,7 @@ function make_json_row(sheet, r, R, cols, header, hdr, o) {
 		var val = dense ? (sheet["!data"][R]||[])[C] : sheet[cols[C] + rr];
 		if(val == null || val.t === undefined) {
 			if(defval === undefined) continue;
-			if(hdr[C] != null) { row[hdr[C]] = defval; }
+			if(hdr[C] != null) safe_set_obj(row, hdr[C], defval);
 			continue;
 		}
 		var v = val.v;
@@ -12345,14 +12388,14 @@ function make_json_row(sheet, r, R, cols, header, hdr, o) {
 			case 'd': if(!(o && (o.UTC||(o.raw === false)))) v = utc_to_local(new Date(v)); break;
 			default: throw new Error('unrecognized type ' + val.t);
 		}
-		if(hdr[C] != null) {
+		if(hdr[C] != null && !is_unsafe_key(hdr[C])) {
 			if(v == null) {
-				if(val.t == "e" && v === null) row[hdr[C]] = null;
-				else if(defval !== undefined) row[hdr[C]] = defval;
-				else if(raw && v === null) row[hdr[C]] = null;
+				if(val.t == "e" && v === null) safe_set_obj(row, hdr[C], null);
+				else if(defval !== undefined) safe_set_obj(row, hdr[C], defval);
+				else if(raw && v === null) safe_set_obj(row, hdr[C], null);
 				else continue;
 			} else {
-				row[hdr[C]] = (val.t === 'n' && typeof o.rawNumbers === 'boolean' ? o.rawNumbers : raw) ? v : format_cell(val, v, o);
+				safe_set_obj(row, hdr[C], (val.t === 'n' && typeof o.rawNumbers === 'boolean' ? o.rawNumbers : raw) ? v : format_cell(val, v, o));
 			}
 			if(v != null) isempty = false;
 		}
@@ -12383,7 +12426,7 @@ function sheet_to_json(sheet, opts) {
 	var outi = 0, counter = 0;
 	var dense = sheet["!data"] != null;
 	var R = r.s.r, C = 0;
-	var header_cnt = {};
+	var header_cnt = safe_obj();
 	if(dense && !sheet["!data"][R]) sheet["!data"][R] = [];
 	var colinfo = o.skipHidden && sheet["!cols"] || [];
 	var rowinfo = o.skipHidden && sheet["!rows"] || [];
@@ -12398,6 +12441,7 @@ function sheet_to_json(sheet, opts) {
 			default:
 				if(val == null) val = {w: "__EMPTY", t: "s"};
 				vv = v = format_cell(val, null, o);
+				if(is_unsafe_key(v)) { hdr[C] = null; break; }
 				counter = header_cnt[v] || 0;
 				if(!counter) header_cnt[v] = 1;
 				else {
@@ -12531,11 +12575,16 @@ function sheet_add_json(_ws, js, opts) {
 		if(_R == -1) { _R = 0; range.e.r = js.length - 1 + offset; }
 	}
 	var hdr = o.header || [], C = 0;
+	if(o.header) {
+		hdr = [];
+		for(C = 0; C != o.header.length; ++C) hdr[C] = is_unsafe_key(o.header[C]) ? null : o.header[C];
+	}
 	var ROW = [];
 	js.forEach(function (JS, R) {
 		if(dense && !ws["!data"][_R + R + offset]) ws["!data"][_R + R + offset] = [];
 		if(dense) ROW = ws["!data"][_R + R + offset];
 		keys(JS).forEach(function(k) {
+			if(is_unsafe_key(k)) return;
 			if((C=hdr.indexOf(k)) == -1) hdr[C=hdr.length] = k;
 			var v = JS[k];
 			var t = 'z';
@@ -12572,6 +12621,7 @@ function sheet_add_json(_ws, js, opts) {
 	var __R = encode_row(_R);
 	if(dense && !ws["!data"][_R]) ws["!data"][_R] = [];
 	if(offset) for(C = 0; C < hdr.length; ++C) {
+		if(hdr[C] == null || is_unsafe_key(hdr[C])) continue;
 		if(dense) ws["!data"][_R][C + _C] = {t:'s', v:hdr[C]};
 		else ws[encode_col(C + _C) + __R] = {t:'s', v:hdr[C]};
 	}
@@ -12611,7 +12661,7 @@ function wb_sheet_idx(wb, sh) {
 
 /* simple blank or single-sheet workbook object */
 function book_new(ws, wsname) {
-	var wb = { SheetNames: [], Sheets: {} };
+	var wb = { SheetNames: [], Sheets: safe_obj() };
 	if(ws) book_append_sheet(wb, ws, wsname || "Sheet1");
 	return wb;
 }
@@ -12631,7 +12681,7 @@ function book_append_sheet(wb, ws, name, roll) {
 	if(wb.SheetNames.indexOf(name) >= 0) throw new Error("Worksheet with name |" + name + "| already exists!");
 
 	wb.SheetNames.push(name);
-	wb.Sheets[name] = ws;
+	safe_set_obj(wb.Sheets, name, ws);
 	return name;
 }
 
@@ -12698,7 +12748,6 @@ function sheet_set_array_formula(ws, range, formula, dynamic) {
 	ws["!ref"] = encode_range(wsr);
 	return ws;
 }
-
 var utils = {
 	encode_col: encode_col,
 	encode_row: encode_row,

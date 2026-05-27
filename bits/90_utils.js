@@ -8,7 +8,7 @@ function make_json_row(sheet/*:Worksheet*/, r/*:Range*/, R/*:number*/, cols/*:Ar
 	var rr = encode_row(R);
 	var defval = o.defval, raw = o.raw || !Object.prototype.hasOwnProperty.call(o, "raw");
 	var isempty = true, dense = (sheet["!data"] != null);
-	var row/*:any*/ = (header === 1) ? [] : {};
+	var row/*:any*/ = (header === 1) ? [] : safe_obj();
 	if(header !== 1) {
 		if(Object.defineProperty) try { Object.defineProperty(row, '__rowNum__', {value:R, enumerable:false}); } catch(e) { row.__rowNum__ = R; }
 		else row.__rowNum__ = R;
@@ -17,7 +17,7 @@ function make_json_row(sheet/*:Worksheet*/, r/*:Range*/, R/*:number*/, cols/*:Ar
 		var val = dense ? (sheet["!data"][R]||[])[C] : sheet[cols[C] + rr];
 		if(val == null || val.t === undefined) {
 			if(defval === undefined) continue;
-			if(hdr[C] != null) { row[hdr[C]] = defval; }
+			if(hdr[C] != null) safe_set_obj(row, hdr[C], defval);
 			continue;
 		}
 		var v = val.v;
@@ -32,14 +32,14 @@ function make_json_row(sheet/*:Worksheet*/, r/*:Range*/, R/*:number*/, cols/*:Ar
 			case 'd': if(!(o && (o.UTC||(o.raw === false)))) v = utc_to_local(new Date(v)); break;
 			default: throw new Error('unrecognized type ' + val.t);
 		}
-		if(hdr[C] != null) {
+		if(hdr[C] != null && !is_unsafe_key(hdr[C])) {
 			if(v == null) {
-				if(val.t == "e" && v === null) row[hdr[C]] = null;
-				else if(defval !== undefined) row[hdr[C]] = defval;
-				else if(raw && v === null) row[hdr[C]] = null;
+				if(val.t == "e" && v === null) safe_set_obj(row, hdr[C], null);
+				else if(defval !== undefined) safe_set_obj(row, hdr[C], defval);
+				else if(raw && v === null) safe_set_obj(row, hdr[C], null);
 				else continue;
 			} else {
-				row[hdr[C]] = (val.t === 'n' && typeof o.rawNumbers === 'boolean' ? o.rawNumbers : raw) ? v : format_cell(val, v, o);
+				safe_set_obj(row, hdr[C], (val.t === 'n' && typeof o.rawNumbers === 'boolean' ? o.rawNumbers : raw) ? v : format_cell(val, v, o));
 			}
 			if(v != null) isempty = false;
 		}
@@ -70,7 +70,7 @@ function sheet_to_json(sheet/*:Worksheet*/, opts/*:?Sheet2JSONOpts*/) {
 	var outi = 0, counter = 0;
 	var dense = sheet["!data"] != null;
 	var R = r.s.r, C = 0;
-	var header_cnt = {};
+	var header_cnt = safe_obj();
 	if(dense && !sheet["!data"][R]) sheet["!data"][R] = [];
 	var colinfo/*:Array<ColInfo>*/ = o.skipHidden && sheet["!cols"] || [];
 	var rowinfo/*:Array<ColInfo>*/ = o.skipHidden && sheet["!rows"] || [];
@@ -85,6 +85,7 @@ function sheet_to_json(sheet/*:Worksheet*/, opts/*:?Sheet2JSONOpts*/) {
 			default:
 				if(val == null) val = {w: "__EMPTY", t: "s"};
 				vv = v = format_cell(val, null, o);
+				if(is_unsafe_key(v)) { hdr[C] = null; break; }
 				counter = header_cnt[v] || 0;
 				if(!counter) header_cnt[v] = 1;
 				else {
@@ -218,11 +219,16 @@ function sheet_add_json(_ws/*:?Worksheet*/, js/*:Array<any>*/, opts)/*:Worksheet
 		if(_R == -1) { _R = 0; range.e.r = js.length - 1 + offset; }
 	}
 	var hdr/*:Array<string>*/ = o.header || [], C = 0;
+	if(o.header) {
+		hdr = [];
+		for(C = 0; C != o.header.length; ++C) hdr[C] = is_unsafe_key(o.header[C]) ? null : o.header[C];
+	}
 	var ROW = [];
 	js.forEach(function (JS, R/*:number*/) {
 		if(dense && !ws["!data"][_R + R + offset]) ws["!data"][_R + R + offset] = [];
 		if(dense) ROW = ws["!data"][_R + R + offset];
 		keys(JS).forEach(function(k) {
+			if(is_unsafe_key(k)) return;
 			if((C=hdr.indexOf(k)) == -1) hdr[C=hdr.length] = k;
 			var v = JS[k];
 			var t = 'z';
@@ -259,6 +265,7 @@ function sheet_add_json(_ws/*:?Worksheet*/, js/*:Array<any>*/, opts)/*:Worksheet
 	var __R = encode_row(_R);
 	if(dense && !ws["!data"][_R]) ws["!data"][_R] = [];
 	if(offset) for(C = 0; C < hdr.length; ++C) {
+		if(hdr[C] == null || is_unsafe_key(hdr[C])) continue;
 		if(dense) ws["!data"][_R][C + _C] = {t:'s', v:hdr[C]};
 		else ws[encode_col(C + _C) + __R] = {t:'s', v:hdr[C]};
 	}
@@ -298,7 +305,7 @@ function wb_sheet_idx(wb/*:Workbook*/, sh/*:number|string*/) {
 
 /* simple blank or single-sheet workbook object */
 function book_new(ws/*:?Worksheet*/, wsname/*:?string*/)/*:Workbook*/ {
-	var wb = { SheetNames: [], Sheets: {} };
+	var wb = { SheetNames: [], Sheets: safe_obj() };
 	if(ws) book_append_sheet(wb, ws, wsname || "Sheet1");
 	return wb;
 }
@@ -318,7 +325,7 @@ function book_append_sheet(wb/*:Workbook*/, ws/*:Worksheet*/, name/*:?string*/, 
 	if(wb.SheetNames.indexOf(name) >= 0) throw new Error("Worksheet with name |" + name + "| already exists!");
 
 	wb.SheetNames.push(name);
-	wb.Sheets[name] = ws;
+	safe_set_obj(wb.Sheets, name, ws);
 	return name;
 }
 
@@ -385,4 +392,3 @@ function sheet_set_array_formula(ws/*:Worksheet*/, range, formula/*:string*/, dy
 	ws["!ref"] = encode_range(wsr);
 	return ws;
 }
-

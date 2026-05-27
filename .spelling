@@ -1,10 +1,14 @@
 # xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com
 SheetJS
+Stackline
+Verdaccio
 sheetjs
+stackline
 js-xlsx
 xls
 xlsb
 xlsx
+spreadsheet
 
 # Excel-related terms
 A1-style
@@ -83,10 +87,27 @@ APIs
 ArrayBuffer
 Base64
 Booleans
+CHANGELOG
+CVE
+CVE-2023-30533
+CVE-2024-22363
+GHSA-4r6h-8v6p-xvw6
+GHSA-5pgg-2g8v-p4x9
+4r6h
+8v6p
+xvw6
+5pgg
+2g8v
+p4x9
+2023-30533
+2024-22363
+DTA
 FileReader
+GHSA
 JS
 NoSQL
 README
+ReDoS
 UTF-8
 UTF-16
 VBScript
@@ -102,6 +123,7 @@ datagrid
 dataset
 deduplication
 destructuring
+dta
 embeddable
 encodings
 filesystem
@@ -110,7 +132,9 @@ javascript
 lifecycle
 metadata
 natively
+plaintext
 pre-built
+prereleases
 pre-generated
 prepend
 prepended
@@ -186,4 +210,3 @@ vscode-data-preview
  - demos/xhr/README.md
 axios
 superagent
-

@@ -4,6 +4,44 @@ This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.
 
+## v1.0.0
+
+* Established the public Stackline package line as `@stackline/xlsx@1.0.0`.
+* Made `npm install @stackline/xlsx` the primary documented install path and
+  kept `xlsx@npm:@stackline/xlsx` as the migration path for existing imports.
+* Centralized unsafe key handling with shared helpers for dangerous keys:
+  `__proto__`, `prototype` and `constructor`.
+* Hardened parser dictionaries with null-prototype maps in workbook, XML,
+  relationship, custom property, ODS, XLS, XLML and ZIP parsing paths.
+* Preserved `SheetNames` semantics in ZIP parsing while ignoring dangerous
+  worksheet names.
+* Preserved JSON header column positions when dangerous headers are ignored.
+* Added stronger regression coverage for real XLSX, ODS and XLS workbooks,
+  relationship IDs, custom properties, JSON headers and malformed HTML input.
+* Added a Verdaccio consumer smoke-test environment with direct and alias usage
+  examples.
+* Kept `npm run build`, `make dist` and package dry-run validation in the
+  release flow.
+* Removed the deprecated `xlsx` CLI from the Stackline package manifest to keep
+  the published library dependency-free at runtime.
+
+## v0.20.2-stackline.1
+
+* Reworked project documentation in the Stackline package style.
+* Added public `SECURITY.md` and `CONTRIBUTING.md` documents for npm
+  publication.
+* Included project documentation files in the package tarball.
+
+## v0.20.2-stackline.0
+
+* Prepared scoped compatibility package `@stackline/xlsx`.
+* Added fork-level guards for prototype pollution keys (`__proto__`,
+  `prototype`, `constructor`) in worksheet names, XML attributes,
+  relationships, custom properties and JSON conversion helpers.
+* Added regression tests for GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533.
+* Retained upstream v0.20.2 ReDoS hardening for GHSA-5pgg-2g8v-p4x9 /
+  CVE-2024-22363 and added a malformed HTML regression test.
+
 ## v0.20.2
 
 * Reworked parsing methods to avoid slow regexes (CVE-2024-22363)
@@ -350,4 +388,3 @@ $ sed -i .ext [...] # bsd
 
 * Removed ods.js source.  The xlsx.js source absorbed the ODS logic and exposes
   the ODS variable, so projects should remove references to ods.js
-

@@ -1,70 +1,56 @@
 # Contributing
 
-The SheetJS Libraries should be free and clear to use in your projects.  In
-order to maintain that, every contributor must be vigilant.
+Thanks for helping improve `@stackline/xlsx`. This project is maintained as a
+SheetJS-compatible fork with security hardening and compatibility guarantees for
+applications that depend on the `xlsx` API.
 
-There have been many projects in the past that have been very lax regarding
-licensing, and we are of the opinion that those are ticking timebombs and that
-no commercial product should depend on them.
+## Development workflow
 
+- Create focused changes with tests for the behavior being changed.
+- Preserve the public `xlsx` API unless the change is explicitly documented as
+  breaking.
+- Keep security fixes in source files and regenerated bundles in the same
+  change.
+- Do not include private customer workbooks, proprietary spreadsheets or
+  unlicensed sample files.
+- Prefer small fixtures that demonstrate the issue without exposing real data.
 
-# Required Reading
+## Local checks
 
-These are pretty short reads and emphasize the importance of proper licensing:
+Run the targeted security regression tests while developing:
 
-- https://github.com/kennethreitz/tablib/issues/114 (discussion of other tools)
+```bash
+npx mocha -R spec -t 10000 test.js -g "security regressions"
+```
 
-- http://www.codinghorror.com/blog/2007/04/pick-a-license-any-license.html
+Run the full suite before opening a pull request:
 
+```bash
+npm test
+```
 
-# Raising Issues
+Build and verify the package:
 
-Issues should generally be accompanied by test files.  Since github does not
-support attachments, the best method is to send files to <sheetjs@gmail.com>
-(subject line should contain issue number or message) or to share using some
-storage service.  Unless expressly permitted, any attachments will not be
-shared or included in a test suite (although I will ask :)
+```bash
+npm run build
+npm pack --dry-run
+```
 
-If sending email to a gmail account is problematic, the <dev@sheetjs.com> email
-inbox is self-hosted.
+## Pull requests
 
-# Opening Pull Requests
+- Explain the problem and the compatibility impact.
+- Link related advisories, issues or test cases when applicable.
+- Add or update tests for parser, writer and utility behavior.
+- Update `README.md` or `CHANGELOG.md` for user-facing changes.
+- Confirm whether the change affects TypeScript definitions.
 
-Before opening a pull request, [squash all commits into 
-one](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History). If the pull 
-request addresses documentation or demos, add `[ci skip]` in the body or title 
-of your commit message to skip Travis checks.
+## Security fixes
 
-# Pre-Contribution Checklist
+Security reports should follow `SECURITY.md`. Do not publish exploit details in
+public issues before a fix is available.
 
-Before thinking about contributing, make sure that:
+## License
 
-- You are not, nor have ever been, an employee of Microsoft Corporation.
-
-- You have not signed any NDAs or Shared Source Agreements with Microsoft
-  Corporation or a subsidiary
-
-- You have not consulted any existing relevant codebase (if you have, please
-  take note of which codebases were consulted).
-
-If you cannot attest to each of these items, the best approach is to raise an
-issue.  If it is a particularly high-priority issue, please drop an email to
-<sheetjs@gmail.com> and it will be prioritized.
-
-
-# Intra-Contribution
-
-Keep these in mind as you work:
-
-- Your contributions are your original work.  Take note of any resources you
-  consult in the process (and be extra careful not to use unlicensed code on
-  the internet.
-
-- You are working on your own time.  Unless they explicitly grant permission,
-  your employer may be the ultimate owner of your IP
-
-# Post-Contribution
-
-Before contributions are merged, you will receive an email (at the address
-associated with the git commit) and will be asked to confirm the aforementioned
-items.  Ensure that the email addresses associated with the commits are valid.
+Contributions are accepted under the Apache-2.0 license. By contributing, you
+confirm that you have the right to submit the work and that it does not include
+code or data from incompatible licenses.

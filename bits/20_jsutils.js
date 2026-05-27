@@ -4,6 +4,28 @@ function keys(o/*:any*/)/*:Array<any>*/ {
 	return o2;
 }
 
+function safe_key(k/*:any*/)/*:string*/ {
+	return String(k);
+}
+function is_unsafe_key(k/*:any*/)/*:boolean*/ {
+	var s = safe_key(k);
+	return s === "__proto__" || s === "prototype" || s === "constructor";
+}
+function is_proto_key(k/*:any*/)/*:boolean*/ {
+	return is_unsafe_key(k);
+}
+function safe_obj()/*:any*/ {
+	return typeof Object.create == "function" ? Object.create(null) : {};
+}
+function safe_has_obj(o/*:any*/, k/*:any*/)/*:boolean*/ {
+	return !is_unsafe_key(k) && Object.prototype.hasOwnProperty.call(o, safe_key(k));
+}
+function safe_set_obj(o/*:any*/, k/*:any*/, v/*:any*/)/*:boolean*/ {
+	if(is_unsafe_key(k)) return false;
+	o[safe_key(k)] = v;
+	return true;
+}
+
 function evert_key(obj/*:any*/, key/*:string*/)/*:EvertType*/ {
 	var o = ([]/*:any*/), K = keys(obj);
 	for(var i = 0; i !== K.length; ++i) if(o[obj[K[i]][key]] == null) o[obj[K[i]][key]] = K[i];
@@ -136,11 +158,10 @@ function cc2str(arr/*:Array<number>*/, debomit)/*:string*/ {
 }
 
 function dup(o/*:any*/)/*:any*/ {
-	if(typeof JSON != 'undefined' && !Array.isArray(o)) return JSON.parse(JSON.stringify(o));
 	if(typeof o != 'object' || o == null) return o;
 	if(o instanceof Date) return new Date(o.getTime());
 	var out = {};
-	for(var k in o) if(Object.prototype.hasOwnProperty.call(o, k)) out[k] = dup(o[k]);
+	for(var k in o) if(safe_has_obj(o, k)) out[k] = dup(o[k]);
 	return out;
 }
 

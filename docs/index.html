@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@stackline/xlsx Documentation</title>
+    <meta
+      name="description"
+      content="Public documentation for @stackline/xlsx, a maintained SheetJS-compatible spreadsheet parser and writer with security hardening."
+    />
+    <link rel="stylesheet" href="./site.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="#top" class="brand">@stackline/xlsx</a>
+      <nav aria-label="Documentation sections">
+        <a href="#install">Install</a>
+        <a href="#usage">Usage</a>
+        <a href="#security">Security</a>
+        <a href="#release">Release</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Stackline spreadsheet package</p>
+          <h1>SheetJS-compatible spreadsheet parsing with security hardening.</h1>
+          <p>
+            A maintained fork for applications that need a practical replacement
+            path for <code>xlsx</code> while preserving the familiar workbook API.
+          </p>
+          <div class="actions">
+            <a href="#install" class="button primary">Install</a>
+            <a href="https://github.com/alexandroit/sheetjs" class="button secondary">GitHub</a>
+          </div>
+        </div>
+
+        <div class="sheet-preview" aria-label="Spreadsheet preview">
+          <div class="sheet-toolbar">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="sheet-grid">
+            <div class="head"></div>
+            <div class="head">A</div>
+            <div class="head">B</div>
+            <div class="head">C</div>
+            <div class="row-head">1</div>
+            <div>Name</div>
+            <div>Role</div>
+            <div>Status</div>
+            <div class="row-head">2</div>
+            <div>Ada</div>
+            <div>Engineer</div>
+            <div class="ok">Safe</div>
+            <div class="row-head">3</div>
+            <div>Grace</div>
+            <div>Reviewer</div>
+            <div class="ok">Parsed</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary">
+        <div>
+          <strong>Version</strong>
+          <span>1.0.0</span>
+        </div>
+        <div>
+          <strong>API target</strong>
+          <span>xlsx 0.20.2</span>
+        </div>
+        <div>
+          <strong>Runtime deps</strong>
+          <span>None</span>
+        </div>
+        <div>
+          <strong>Types</strong>
+          <span>Included</span>
+        </div>
+      </section>
+
+      <section id="install" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Install</p>
+          <h2>Use the scoped package directly.</h2>
+        </div>
+        <pre><code>npm install @stackline/xlsx</code></pre>
+        <p>
+          Existing apps that must keep
+          <code>import * as XLSX from 'xlsx'</code> can use npm alias migration.
+        </p>
+        <pre><code>npm install xlsx@npm:@stackline/xlsx</code></pre>
+      </section>
+
+      <section id="usage" class="section two-column">
+        <div>
+          <p class="eyebrow">Usage</p>
+          <h2>Read spreadsheets in Angular or browser workflows.</h2>
+          <pre><code>import * as XLSX from '@stackline/xlsx';
+
+export function parseWorkbook(file: ArrayBuffer) {
+  const workbook = XLSX.read(file, { type: 'array' });
+  const sheetName = workbook.SheetNames[0];
+  return XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+    defval: null
+  });
+}</code></pre>
+        </div>
+        <div>
+          <p class="eyebrow">Write</p>
+          <h2>Create workbook data with the familiar API.</h2>
+          <pre><code>const worksheet = XLSX.utils.json_to_sheet([
+  { name: 'Ada', role: 'Engineer' },
+  { name: 'Grace', role: 'Reviewer' }
+]);
+
+const workbook = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
+        </div>
+      </section>
+
+      <section id="security" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Security</p>
+          <h2>Regression coverage for known advisories.</h2>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <h3>Prototype pollution</h3>
+            <p>
+              Parser and conversion paths reject or ignore `__proto__`,
+              `prototype` and `constructor` where untrusted input can become an
+              object key.
+            </p>
+          </article>
+          <article>
+            <h3>ReDoS</h3>
+            <p>
+              The package keeps the upstream regular expression hardening and
+              adds malformed input regression coverage.
+            </p>
+          </article>
+          <article>
+            <h3>Workbook fixtures</h3>
+            <p>
+              Tests cover XLSX, ODS, XLS, XLML, relationships, custom
+              properties and JSON headers with malicious keys.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Formats</p>
+          <h2>Format support follows the SheetJS CE 0.20.2 line.</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Format family</th>
+              <th>Read</th>
+              <th>Write</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>XLSX / XLSM / XLSB</td><td>Yes</td><td>Yes</td><td>Modern Excel workbook formats</td></tr>
+            <tr><td>XLS</td><td>Yes</td><td>Yes</td><td>Legacy Excel workbook format</td></tr>
+            <tr><td>ODS / FODS</td><td>Yes</td><td>Yes</td><td>OpenDocument spreadsheet formats</td></tr>
+            <tr><td>CSV / TSV / TXT</td><td>Yes</td><td>Yes</td><td>Plaintext tabular data</td></tr>
+            <tr><td>HTML tables</td><td>Yes</td><td>Yes</td><td>Table import and export helpers</td></tr>
+            <tr><td>DBF / SYLK / DIF</td><td>Yes</td><td>Yes</td><td>Legacy interchange formats</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="release" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Release</p>
+          <h2>Public release checklist.</h2>
+        </div>
+        <ul class="checklist">
+          <li>Run `npm ci`.</li>
+          <li>Run `npm test`.</li>
+          <li>Run `npm run build`.</li>
+          <li>Run `make dist`.</li>
+          <li>Run `npm pack --dry-run`.</li>
+          <li>Smoke test direct scoped usage and npm alias migration.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Apache-2.0. Maintained by Stackline as an independent fork of SheetJS
+        Community Edition.
+      </p>
+    </footer>
+  </body>
+</html>

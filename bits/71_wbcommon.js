@@ -118,6 +118,7 @@ function check_ws_name(n/*:string*/, safe/*:?boolean*/)/*:boolean*/ {
 	try {
 		if(n == "") throw new Error("Sheet name cannot be blank");
 		if(n.length > 31) throw new Error("Sheet name cannot exceed 31 chars");
+		if(is_proto_key(n)) throw new Error("Sheet name cannot be a reserved object key");
 		if(n.charCodeAt(0) == 0x27 || n.charCodeAt(n.length - 1) == 0x27) throw new Error("Sheet name cannot start or end with apostrophe (')");
 		if(n.toLowerCase() == "history") throw new Error("Sheet name cannot be 'History'");
 		badchars.forEach(function(c) {

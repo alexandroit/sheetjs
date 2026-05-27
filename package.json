@@ -1,8 +1,8 @@
 {
-	"name": "xlsx",
-	"version": "0.20.2",
+	"name": "@stackline/xlsx",
+	"version": "1.0.0",
 	"author": "sheetjs",
-	"description": "SheetJS Spreadsheet data parser and writer",
+	"description": "SheetJS-compatible spreadsheet parser and writer with Stackline security hardening",
 	"keywords": [
 		"excel",
 		"xls",
@@ -17,9 +17,6 @@
 		"office",
 		"spreadsheet"
 	],
-	"bin": {
-		"xlsx": "./bin/xlsx.njs"
-	},
 	"main": "xlsx.js",
 	"module": "xlsx.mjs",
 	"unpkg": "dist/xlsx.full.min.js",
@@ -109,8 +106,6 @@
 		"fs": false
 	},
 	"sideEffects": false,
-	"dependencies": {
-	},
 	"devDependencies": {
 		"@sheetjs/uglify-js": "~2.7.3",
 		"@types/node": "^8.5.9",
@@ -139,7 +134,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://git.sheetjs.com/SheetJS/sheetjs"
+		"url": "git+https://github.com/alexandroit/sheetjs.git"
 	},
 	"scripts": {
 		"pretest": "npm run lint",
@@ -166,18 +161,37 @@
 			"holes"
 		]
 	},
-	"homepage": "https://sheetjs.com/",
+	"homepage": "https://alexandro.net/docs/vanilla/xlsx/",
+	"publishConfig": {
+		"access": "public"
+	},
 	"files": [
-		"CHANGELOG.md", "LICENSE", "README.md", "bower.json", "package.json", "xlsx.js", "xlsx.mjs", "xlsxworker.js",
-		"bin/xlsx.njs",
-		"dist/LICENSE", "dist/*.mjs", "dist/*.js", "dist/*.map", "dist/*.d.ts",
-		"types/index.d.ts", "types/tsconfig.json"
+		"CHANGELOG.md",
+		"CONTRIBUTING.md",
+		"LICENSE",
+		"README.md",
+		"SECURITY.md",
+		"bower.json",
+		"package.json",
+		"xlsx.js",
+		"xlsx.mjs",
+		"xlsxworker.js",
+		"dist/LICENSE",
+		"dist/*.mjs",
+		"dist/*.js",
+		"dist/*.map",
+		"dist/*.d.ts",
+		"types/index.d.ts",
+		"types/tsconfig.json"
 	],
 	"bugs": {
-		"url": "https://git.sheetjs.com/SheetJS/sheetjs/issues"
+		"url": "https://github.com/alexandroit/sheetjs/issues"
 	},
 	"license": "Apache-2.0",
 	"engines": {
 		"node": ">=0.8"
+	},
+	"directories": {
+		"test": "tests"
 	}
 }

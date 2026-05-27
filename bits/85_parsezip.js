@@ -22,12 +22,14 @@ function parse_sheet_legacy_drawing(sheet, type, zip, path, idx, opts, wb, comme
 
 function safe_parse_sheet(zip, path/*:string*/, relsPath/*:string*/, sheet, idx/*:number*/, sheetRels, sheets, stype/*:string*/, opts, wb, themes, styles) {
 	try {
-		sheetRels[sheet]=parse_rels(getzipstr(zip, relsPath, true), path);
+		if(is_unsafe_key(sheet)) throw new Error("Bad sheet name: " + sheet);
+		var sheetKey = safe_key(sheet);
+		safe_set_obj(sheetRels, sheetKey, parse_rels(getzipstr(zip, relsPath, true), path));
 		var data = getzipdata(zip, path);
 		var _ws;
 		switch(stype) {
-			case 'sheet':  _ws = parse_ws(data, path, idx, opts, sheetRels[sheet], wb, themes, styles); break;
-			case 'chart':  _ws = parse_cs(data, path, idx, opts, sheetRels[sheet], wb, themes, styles);
+			case 'sheet':  _ws = parse_ws(data, path, idx, opts, sheetRels[sheetKey], wb, themes, styles); break;
+			case 'chart':  _ws = parse_cs(data, path, idx, opts, sheetRels[sheetKey], wb, themes, styles);
 				if(!_ws || !_ws['!drawel']) break;
 				var dfile = resolve_path(_ws['!drawel'].Target, path);
 				var drelsp = get_rels_path(dfile);
@@ -36,30 +38,32 @@ function safe_parse_sheet(zip, path/*:string*/, relsPath/*:string*/, sheet, idx/
 				var crelsp = get_rels_path(chartp);
 				_ws = parse_chart(getzipstr(zip, chartp, true), chartp, opts, parse_rels(getzipstr(zip, crelsp, true), chartp), wb, _ws);
 				break;
-			case 'macro':  _ws = parse_ms(data, path, idx, opts, sheetRels[sheet], wb, themes, styles); break;
-			case 'dialog': _ws = parse_ds(data, path, idx, opts, sheetRels[sheet], wb, themes, styles); break;
+			case 'macro':  _ws = parse_ms(data, path, idx, opts, sheetRels[sheetKey], wb, themes, styles); break;
+			case 'dialog': _ws = parse_ds(data, path, idx, opts, sheetRels[sheetKey], wb, themes, styles); break;
 			default: throw new Error("Unrecognized sheet type " + stype);
 		}
-		sheets[sheet] = _ws;
+		if(!safe_set_obj(sheets, sheetKey, _ws)) return false;
 
 		/* scan rels for comments and threaded comments */
 		var comments = [], tcomments = [];
-		if(sheetRels && sheetRels[sheet]) keys(sheetRels[sheet]).forEach(function(n) {
+		if(sheetRels && sheetRels[sheetKey]) keys(sheetRels[sheetKey]).forEach(function(n) {
 			var dfile = "";
-			if(sheetRels[sheet][n].Type == RELS.CMNT) {
-				dfile = resolve_path(sheetRels[sheet][n].Target, path);
+			if(sheetRels[sheetKey][n].Type == RELS.CMNT) {
+				dfile = resolve_path(sheetRels[sheetKey][n].Target, path);
 				comments = parse_cmnt(getzipdata(zip, dfile, true), dfile, opts);
 				if(!comments || !comments.length) return;
 				sheet_insert_comments(_ws, comments, false);
 			}
-			if(sheetRels[sheet][n].Type == RELS.TCMNT) {
-				dfile = resolve_path(sheetRels[sheet][n].Target, path);
+			if(sheetRels[sheetKey][n].Type == RELS.TCMNT) {
+				dfile = resolve_path(sheetRels[sheetKey][n].Target, path);
 				tcomments = tcomments.concat(parse_tcmnt_xml(getzipdata(zip, dfile, true), opts));
 			}
 		});
 		if(tcomments && tcomments.length) sheet_insert_comments(_ws, tcomments, true, opts.people || []);
 		parse_sheet_legacy_drawing(_ws, stype, zip, path, idx, opts, wb, comments);
+		return true;
 	} catch(e) { if(opts.WTF) throw e; }
+	return false;
 }
 
 function strip_front_slash(x/*:string*/)/*:string*/ { return x.charAt(0) == '/' ? x.slice(1) : x; }
@@ -115,8 +119,8 @@ function parse_zip(zip/*:ZIP*/, opts/*:?ParseOpts*/)/*:Workbook*/ {
 	}
 	if(dir.workbooks[0].slice(-3) == "bin") xlsb = true;
 
-	var themes = ({}/*:any*/);
-	var styles = ({}/*:any*/);
+	var themes = safe_obj();
+	var styles = safe_obj();
 	if(!opts.bookSheets && !opts.bookProps) {
 		strs = [];
 		if(dir.sst) try { strs=parse_sst(getzipdata(zip, strip_front_slash(dir.sst)), dir.sst, opts); } catch(e) { if(opts.WTF) throw e; }
@@ -146,7 +150,7 @@ function parse_zip(zip/*:ZIP*/, opts/*:?ParseOpts*/)/*:Workbook*/ {
 		}
 	}
 
-	var custprops = {};
+	var custprops = safe_obj();
 	if(!opts.bookSheets || opts.bookProps) {
 		if (dir.custprops.length !== 0) {
 			propdata = getzipstr(zip, strip_front_slash(dir.custprops[0]), true);
@@ -158,17 +162,22 @@ function parse_zip(zip/*:ZIP*/, opts/*:?ParseOpts*/)/*:Workbook*/ {
 	if(opts.bookSheets || opts.bookProps) {
 		if(wb.Sheets) sheets = wb.Sheets.map(function pluck(x){ return x.name; });
 		else if(props.Worksheets && props.SheetNames.length > 0) sheets=props.SheetNames;
+		if(sheets) {
+			var _sheets = [];
+			for(var _si = 0; _si != sheets.length; ++_si) if(!is_unsafe_key(sheets[_si])) _sheets.push(sheets[_si]);
+			sheets = _sheets;
+		}
 		if(opts.bookProps) { out.Props = props; out.Custprops = custprops; }
 		if(opts.bookSheets && typeof sheets !== 'undefined') out.SheetNames = sheets;
 		if(opts.bookSheets ? out.SheetNames : opts.bookProps) return out;
 	}
-	sheets = {};
+	sheets = safe_obj();
 
-	var deps = {};
+	var deps = safe_obj();
 	if(opts.bookDeps && dir.calcchain) deps=parse_cc(getzipdata(zip, strip_front_slash(dir.calcchain)),dir.calcchain,opts);
 
 	var i=0;
-	var sheetRels = ({}/*:any*/);
+	var sheetRels = safe_obj();
 	var path, relsPath;
 
 	{
@@ -199,7 +208,11 @@ function parse_zip(zip/*:ZIP*/, opts/*:?ParseOpts*/)/*:Workbook*/ {
 
 	/* Numbers iOS hack */
 	var nmode = (getzipdata(zip,"xl/worksheets/sheet.xml",true))?1:0;
+	var safeAllSheetNames/*:Array<string>*/ = [], parsedSheets/*:Array<string>*/ = [];
 	wsloop: for(i = 0; i != props.Worksheets; ++i) {
+		var sheetName = props.SheetNames[i];
+		if(is_unsafe_key(sheetName)) { if(opts.WTF) throw new Error("Bad sheet name: " + sheetName); continue wsloop; }
+		safeAllSheetNames.push(sheetName);
 		var stype = "sheet";
 		if(wbrels && wbrels[i]) {
 			path = 'xl/' + (wbrels[i][1]).replace(/[\/]?xl\//, "");
@@ -213,18 +226,20 @@ function parse_zip(zip/*:ZIP*/, opts/*:?ParseOpts*/)/*:Workbook*/ {
 		relsPath = path.replace(/^(.*)(\/)([^\/]*)$/, "$1/_rels/$3.rels");
 		if(opts && opts.sheets != null) switch(typeof opts.sheets) {
 			case "number": if(i != opts.sheets) continue wsloop; break;
-			case "string": if(props.SheetNames[i].toLowerCase() != opts.sheets.toLowerCase()) continue wsloop; break;
+			case "string": if(sheetName.toLowerCase() != opts.sheets.toLowerCase()) continue wsloop; break;
 			default: if(Array.isArray && Array.isArray(opts.sheets)) {
 				var snjseen = false;
 				for(var snj = 0; snj != opts.sheets.length; ++snj) {
 					if(typeof opts.sheets[snj] == "number" && opts.sheets[snj] == i) snjseen=1;
-					if(typeof opts.sheets[snj] == "string" && opts.sheets[snj].toLowerCase() == props.SheetNames[i].toLowerCase()) snjseen = 1;
+					if(typeof opts.sheets[snj] == "string" && opts.sheets[snj].toLowerCase() == sheetName.toLowerCase()) snjseen = 1;
 				}
 				if(!snjseen) continue wsloop;
 			}
 		}
-		safe_parse_sheet(zip, path, relsPath, props.SheetNames[i], i, sheetRels, sheets, stype, opts, wb, themes, styles);
+		if(safe_parse_sheet(zip, path, relsPath, sheetName, i, sheetRels, sheets, stype, opts, wb, themes, styles)) parsedSheets.push(sheetName);
 	}
+	props.SheetNames = safeAllSheetNames;
+	props.Worksheets = safeAllSheetNames.length;
 
 	out = ({
 		Directory: dir,
@@ -233,7 +248,7 @@ function parse_zip(zip/*:ZIP*/, opts/*:?ParseOpts*/)/*:Workbook*/ {
 		Custprops: custprops,
 		Deps: deps,
 		Sheets: sheets,
-		SheetNames: props.SheetNames,
+		SheetNames: safeAllSheetNames,
 		Strings: strs,
 		Styles: styles,
 		Themes: themes,
@@ -245,11 +260,11 @@ function parse_zip(zip/*:ZIP*/, opts/*:?ParseOpts*/)/*:Workbook*/ {
 			out.files = zip.files;
 		} else {
 			out.keys = [];
-			out.files = {};
+			out.files = safe_obj();
 			zip.FullPaths.forEach(function(p, idx) {
 				p = p.replace(/^Root Entry[\/]/, "");
 				out.keys.push(p);
-				out.files[p] = zip.FileIndex[idx];
+				safe_set_obj(out.files, p, zip.FileIndex[idx]);
 			});
 		}
 	}
@@ -307,4 +322,3 @@ function parse_xlsxcfb(cfb, _opts/*:?ParseOpts*/)/*:Workbook*/ {
 	if(einfo[0] == 0x02 && typeof decrypt_std76 !== 'undefined') return decrypt_std76(einfo[1], data.content, opts.password || "", opts);
 	throw new Error("File is password-protected");
 }
-

@@ -1,0 +1,14 @@
+{
+  "name": "@stackline/xlsx-verdaccio-consumer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Verdaccio smoke test consumer for @stackline/xlsx",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node smoke-direct.cjs && node smoke-alias.cjs && node smoke-esm.mjs"
+  },
+  "dependencies": {
+    "@stackline/xlsx": "latest",
+    "xlsx": "npm:@stackline/xlsx@latest"
+  }
+}

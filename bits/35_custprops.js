@@ -1,7 +1,7 @@
 /* 15.2.12.2 Custom File Properties Part */
 var custregex = /<[^<>]+>[^<]*/g;
 function parse_cust_props(data/*:string*/, opts) {
-	var p = {}, name = "";
+	var p = safe_obj(), name = "";
 	var m = data.match(custregex);
 	if(m) for(var i = 0; i != m.length; ++i) {
 		var x = m[i], y = parsexmltag(x);
@@ -10,33 +10,35 @@ function parse_cust_props(data/*:string*/, opts) {
 			case '<Properties': break;
 			case '<property': name = unescapexml(y.name); break;
 			case '</property>': name = null; break;
-			default: if (x.indexOf('<vt:') === 0) {
+			default: if (x.indexOf('<vt:') === 0 && name != null && !is_unsafe_key(name)) {
 				var toks = x.split('>');
-				var type = toks[0].slice(4), text = toks[1];
+				var type = toks[0].slice(4), text = toks[1], val/*:any*/ = null, setval = true;
 				/* 22.4.2.32 (CT_Variant). Omit the binary types from 22.4 (Variant Types) */
 				switch(type) {
 					case 'lpstr': case 'bstr': case 'lpwstr':
-						p[name] = unescapexml(text);
+						val = unescapexml(text);
 						break;
 					case 'bool':
-						p[name] = parsexmlbool(text);
+						val = parsexmlbool(text);
 						break;
 					case 'i1': case 'i2': case 'i4': case 'i8': case 'int': case 'uint':
-						p[name] = parseInt(text, 10);
+						val = parseInt(text, 10);
 						break;
 					case 'r4': case 'r8': case 'decimal':
-						p[name] = parseFloat(text);
+						val = parseFloat(text);
 						break;
 					case 'filetime': case 'date':
-						p[name] = parseDate(text);
+						val = parseDate(text);
 						break;
 					case 'cy': case 'error':
-						p[name] = unescapexml(text);
+						val = unescapexml(text);
 						break;
 					default:
+						setval = false;
 						if(type.slice(-1) == '/') break;
 						if(opts.WTF && typeof console !== 'undefined') console.warn('Unexpected', x, type, toks);
 				}
+				if(setval) safe_set_obj(p, name, val);
 			} else if(x.slice(0,2) === "</") {/* empty */
 			} else if(opts.WTF) throw new Error(x);
 		}
@@ -51,7 +53,9 @@ function write_cust_props(cp/*::, opts*/)/*:string*/ {
 	})];
 	if(!cp) return o.join("");
 	var pid = 1;
-	keys(cp).forEach(function custprop(k) { ++pid;
+	keys(cp).forEach(function custprop(k) {
+		if(is_unsafe_key(k)) return;
+		++pid;
 		o[o.length] = (writextag('property', write_vt(cp[k], true), {
 			'fmtid': '{D5CDD505-2E9C-101B-9397-08002B2CF9AE}',
 			'pid': pid,

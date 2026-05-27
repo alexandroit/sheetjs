@@ -102,7 +102,7 @@ function make_cell(val, ixfe, t)/*:Cell*/ {
 // 2.3.2
 function parse_workbook(blob, options/*:ParseOpts*/)/*:Workbook*/ {
 	var wb = ({opts:{}}/*:any*/);
-	var Sheets = {};
+	var Sheets = safe_obj();
 	if(DENSE != null && options.dense == null) options.dense = DENSE;
 	var out/*:Worksheet*/ = ({}/*:any*/); if(options.dense) out["!data"] = [];
 	var Directory = {};
@@ -325,7 +325,9 @@ function parse_workbook(blob, options/*:ParseOpts*/)/*:Workbook*/ {
 						if(rowinfo.length > 0) out["!rows"] = rowinfo;
 						Workbook.Sheets.push(wsprops);
 					}
-					if(cur_sheet === "") Preamble = out; else Sheets[cur_sheet] = out;
+					if(cur_sheet === "") Preamble = out;
+					else if(is_unsafe_key(cur_sheet)) { if(options.WTF) throw new Error("Bad sheet name: " + cur_sheet); }
+					else safe_set_obj(Sheets, cur_sheet, out);
 					out = ({}/*:any*/); if(options.dense) out["!data"] = [];
 				} break;
 				case 0x0009: case 0x0209: case 0x0409: case 0x0809 /* BOF */: {
@@ -595,7 +597,7 @@ function parse_workbook(blob, options/*:ParseOpts*/)/*:Workbook*/ {
 			blob.l += length;
 		}
 	}
-	wb.SheetNames=keys(Directory).sort(function(a,b) { return Number(a) - Number(b); }).map(function(x){return Directory[x].name;});
+	wb.SheetNames=keys(Directory).sort(function(a,b) { return Number(a) - Number(b); }).map(function(x){return Directory[x].name;}).filter(function(n) { return !is_unsafe_key(n); });
 	if(!options.bookSheets) wb.Sheets=Sheets;
 	if(!wb.SheetNames.length && Preamble["!ref"]) {
 		wb.SheetNames.push("Sheet1");

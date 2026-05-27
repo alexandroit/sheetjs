@@ -244,7 +244,7 @@ function parse_content_xml(d/*:string*/, _opts, _nfm)/*:Workbook*/ {
 		var nfidx, NF = "", pidx = 0;
 		var sheetag/*:: = {name:"", '名称':""}*/;
 		var rowtag/*:: = {'行号':""}*/;
-		var Sheets = {}, SheetNames/*:Array<string>*/ = [];
+		var Sheets = safe_obj(), SheetNames/*:Array<string>*/ = [];
 		var ws = ({}/*:any*/); if(opts.dense) ws["!data"] = [];
 		var Rn, q/*:: :any = ({t:"", v:null, z:null, w:"",c:[],}:any)*/;
 		var ctag = ({value:""}/*:any*/);
@@ -280,8 +280,11 @@ function parse_content_xml(d/*:string*/, _opts, _nfm)/*:Workbook*/ {
 					if(rowinfo.length) ws["!rows"] = rowinfo;
 					sheetag.name = sheetag['名称'] || sheetag.name;
 					if(typeof JSON !== 'undefined') JSON.stringify(sheetag);
-					SheetNames.push(sheetag.name);
-					Sheets[sheetag.name] = ws;
+					if(is_unsafe_key(sheetag.name)) { if(opts.WTF) throw new Error("Bad sheet name: " + sheetag.name); }
+					else {
+						SheetNames.push(sheetag.name);
+						safe_set_obj(Sheets, sheetag.name, ws);
+					}
 					intable = false;
 				}
 				else if(Rn[0].charAt(Rn[0].length-2) !== '/') {
@@ -792,4 +795,3 @@ function parse_fods(data/*:string*/, opts/*:?ParseOpts*/)/*:Workbook*/ {
 	wb.bookType = "fods";
 	return wb;
 }
-

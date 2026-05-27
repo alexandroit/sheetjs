@@ -41,12 +41,13 @@ function get_rels_path(file/*:string*/)/*:string*/ {
 }
 
 function parse_rels(data/*:?string*/, currentFilePath/*:string*/) {
-	var rels = {"!id":{}};
+	var rels = safe_obj();
+	rels["!id"] = safe_obj();
 	if (!data) return rels;
 	if (currentFilePath.charAt(0) !== '/') {
 		currentFilePath = '/'+currentFilePath;
 	}
-	var hash = {};
+	var hash = safe_obj();
 
 	(data.match(tagregex)||[]).forEach(function(x) {
 		var y = parsexmltag(x);
@@ -54,8 +55,8 @@ function parse_rels(data/*:?string*/, currentFilePath/*:string*/) {
 		if (y[0] === '<Relationship') {
 			var rel = {}; rel.Type = y.Type; rel.Target = unescapexml(y.Target); rel.Id = y.Id; if(y.TargetMode) rel.TargetMode = y.TargetMode;
 			var canonictarget = y.TargetMode === 'External' ? y.Target : resolve_path(y.Target, currentFilePath);
-			rels[canonictarget] = rel;
-			hash[y.Id] = rel;
+			safe_set_obj(rels, canonictarget, rel);
+			safe_set_obj(hash, y.Id, rel);
 		}
 	});
 	rels["!id"] = hash;
@@ -78,7 +79,7 @@ function write_rels(rels)/*:string*/ {
 
 function add_rels(rels, rId/*:number*/, f, type, relobj, targetmode/*:?string*/)/*:number*/ {
 	if(!relobj) relobj = {};
-	if(!rels['!id']) rels['!id'] = {};
+	if(!rels['!id']) rels['!id'] = safe_obj();
 	if(!rels['!idx']) rels['!idx'] = 1;
 	if(rId < 0) for(rId = rels['!idx']; rels['!id']['rId' + rId]; ++rId){/* empty */}
 	rels['!idx'] = rId + 1;
@@ -88,7 +89,7 @@ function add_rels(rels, rId/*:number*/, f, type, relobj, targetmode/*:?string*/)
 	if(targetmode) relobj.TargetMode = targetmode;
 	else if([RELS.HLINK, RELS.XPATH, RELS.XMISS].indexOf(relobj.Type) > -1) relobj.TargetMode = "External";
 	if(rels['!id'][relobj.Id]) throw new Error("Cannot rewrite rId " + rId);
-	rels['!id'][relobj.Id] = relobj;
-	rels[('/' + relobj.Target).replace("//","/")] = relobj;
+	safe_set_obj(rels['!id'], relobj.Id, relobj);
+	safe_set_obj(rels, ('/' + relobj.Target).replace("//","/"), relobj);
 	return rId;
 }

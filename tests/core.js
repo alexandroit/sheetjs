@@ -1946,6 +1946,72 @@ describe('invalid files', function() {
 	});
 });
 
+describe('security regressions', function() {
+	var dangerous_keys = ["__proto__", "prototype", "constructor"];
+	afterEach(function() { delete Object.prototype.polluted; });
+
+	it('should reject dangerous worksheet names', function() {
+		dangerous_keys.forEach(function(n) { assert.throws(function() {
+			var wb = X.utils.book_new();
+			X.utils.book_append_sheet(wb, X.utils.aoa_to_sheet([["safe"]]), n);
+		}); });
+		assert.equal(({}).polluted, undefined);
+	});
+
+	it('should not pollute prototypes from sheet_to_json headers', function() {
+		var payload = {polluted: "yes"};
+		var ws = {
+			"!ref": "A1:D2",
+			A1: {t: "s", v: "__proto__"},
+			B1: {t: "s", v: "constructor"},
+			C1: {t: "s", v: "prototype"},
+			D1: {t: "s", v: "safe"},
+			A2: {t: "s", v: payload},
+			B2: {t: "s", v: "bad"},
+			C2: {t: "s", v: "bad"},
+			D2: {t: "s", v: "ok"}
+		};
+		var out = X.utils.sheet_to_json(ws, {raw: true});
+		assert.equal(out.length, 1);
+		assert.equal(out[0].safe, "ok");
+		assert.equal(out[0].polluted, undefined);
+		dangerous_keys.forEach(function(k) { assert.equal(Object.prototype.hasOwnProperty.call(out[0], k), false); });
+		assert.equal(({}).polluted, undefined);
+	});
+
+	it('should ignore dangerous keys in JSON conversion', function() {
+		var row = JSON.parse('{"__proto__":{"polluted":"yes"},"constructor":"bad","prototype":"bad","safe":42}');
+		var ws = X.utils.json_to_sheet([row]);
+		var out = X.utils.sheet_to_json(ws, {raw: true});
+		assert.equal(out.length, 1);
+		assert.equal(out[0].safe, 42);
+		dangerous_keys.forEach(function(k) { assert.equal(Object.prototype.hasOwnProperty.call(out[0], k), false); });
+		assert.equal(({}).polluted, undefined);
+	});
+
+	it('should ignore dangerous sheet names when parsing XLML', function() {
+		var xlml = [
+			'<?xml version="1.0"?>',
+			'<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">',
+			'<Worksheet ss:Name="__proto__"><Table><Row><Cell><Data ss:Type="String">bad</Data></Cell></Row></Table></Worksheet>',
+			'<Worksheet ss:Name="Safe"><Table><Row><Cell><Data ss:Type="String">ok</Data></Cell></Row></Table></Worksheet>',
+			'</Workbook>'
+		].join("");
+		var wb = X.read(xlml, {type: "string"});
+		assert.deepEqual(wb.SheetNames, ["Safe"]);
+		assert.equal(wb.Sheets.Safe.A1.v, "ok");
+		assert.equal(({}).polluted, undefined);
+	});
+
+	it('should handle malformed HTML without regex backtracking stalls', function() {
+		this.timeout(10000);
+		var html = "<table><tr><td>" + new Array(50000).join("<") + "x" + new Array(50000).join(">") + "</td></tr></table>";
+		var start = Date.now();
+		try { X.read(html, {type: "string", raw: true}); } catch(e) {}
+		assert.ok(Date.now() - start < 5000);
+	});
+});
+
 
 describe('json output', function() {
 	function seeker(json, keys, val) {
