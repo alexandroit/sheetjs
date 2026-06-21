@@ -160,7 +160,7 @@ var DO_NOT_EXPORT_CODEPAGE = true;
 /*global global, exports, module, require:false, process:false, Buffer:false, ArrayBuffer:false, DataView:false, Deno:false, Set:false, Float32Array:false */
 var XLSX = {};
 function make_xlsx_lib(XLSX){
-XLSX.version = '1.0.2';
+XLSX.version = '1.0.3';
 var current_codepage = 1200, current_ansi = 1252;
 /*global cptable:true, window */
 var $cptable;
@@ -22850,7 +22850,8 @@ function is_dom_element_hidden(element) {
 	var get_computed_style = get_get_computed_style_function(element);
 	if(get_computed_style) display = get_computed_style(element).getPropertyValue('display');
 	if(!display) display = element.style && element.style.display;
-	return display === 'none';
+	if(display === 'none') return true;
+	return is_dom_element_hidden_by_css_rule(element);
 }
 
 /* global getComputedStyle */
@@ -22860,6 +22861,27 @@ function get_get_computed_style_function(element) {
 	// If it is not available, try to get one from the global namespace
 	if(typeof getComputedStyle === 'function') return getComputedStyle;
 	return null;
+}
+
+function is_dom_element_hidden_by_css_rule(element) {
+	var doc = element.ownerDocument;
+	if(!doc || !doc.styleSheets) return false;
+	var matches = element.matches || element.msMatchesSelector || element.webkitMatchesSelector;
+	if(!matches) return false;
+	for(var i = 0; i < doc.styleSheets.length; ++i) {
+		var rules = null;
+		try { rules = doc.styleSheets[i].cssRules || doc.styleSheets[i].rules; } catch(e) { continue; }
+		if(!rules) continue;
+		for(var j = 0; j < rules.length; ++j) {
+			var rule = rules[j];
+			if(!rule || !rule.style || rule.style.display !== 'none' || !rule.selectorText) continue;
+			var selectors = rule.selectorText.split(",");
+			for(var k = 0; k < selectors.length; ++k) try {
+				if(matches.call(element, selectors[k].trim())) return true;
+			} catch(e) {}
+		}
+	}
+	return false;
 }
 /* OpenDocument */
 function parse_text_p(text) {

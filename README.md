@@ -14,7 +14,7 @@
 **[Issues](https://github.com/alexandroit/sheetjs/issues)** |
 **[Repository](https://github.com/alexandroit/sheetjs)**
 
-**Public release line:** `1.0.2`
+**Public release line:** `1.0.3`
 
 ---
 
@@ -31,7 +31,7 @@ including Angular applications that currently depend on `xlsx`.
 
 | Item | Value |
 | :--- | :--- |
-| Package | `@stackline/xlsx@1.0.2` |
+| Package | `@stackline/xlsx@1.0.3` |
 | API target | `xlsx@0.20.2` |
 | Runtime dependencies | none |
 | Supported Node.js | `>=20` |

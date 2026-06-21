@@ -4,6 +4,17 @@ This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.
 
+## v1.0.3
+
+* Refreshed development security tooling and removed abandoned audit sources
+  from the release workflow.
+* Replaced legacy `dtslint` checks with the maintained TypeScript compiler
+  check used by the local package flow.
+* Migrated ESLint checks to the current flat-config format while preserving the
+  existing warning-only behavior for historical generated files.
+* Fixed hidden HTML row detection for modern DOM environments when visibility is
+  defined through CSS rules.
+
 ## v1.0.2
 
 * Fixed public README and docs license links to point to the active GitHub

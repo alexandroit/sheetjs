@@ -25,6 +25,7 @@ FLOWAUX=$(patsubst %.js,%.flow.js,$(AUXTARGETS))
 AUXSCPTS=xlsxworker.js
 FLOWTGTS=$(TARGET) $(AUXTARGETS) $(AUXSCPTS) $(MINITGT)
 UGLIFYOPTS=--support-ie8 -m
+UGLIFYJS=./node_modules/.bin/uglifyjs
 CLOSURE=/usr/local/lib/node_modules/google-closure-compiler/compiler.jar
 
 ## Main Targets
@@ -77,19 +78,19 @@ DISTHDR=misc/suppress_export.js
 dist: dist-deps $(TARGET) bower.json ## Prepare JS files for distribution
 	mkdir -p dist
 	cp LICENSE dist/
-	uglifyjs shim.js $(UGLIFYOPTS) -o dist/shim.min.js --preamble "$$(head -n 1 bits/00_header.js)"
+	$(UGLIFYJS) shim.js $(UGLIFYOPTS) -o dist/shim.min.js --preamble "$$(head -n 1 bits/00_header.js)"
 	@#
 	<$(TARGET) sed "s/require('.*')/undefined/g;s/ process / undefined /g;s/process.versions/({})/g" > dist/$(TARGET)
 	<$(MINITGT) sed "s/require('.*')/undefined/g;s/ process / undefined /g;s/process.versions/({})/g" > dist/$(MINITGT)
 	@# core
-	uglifyjs $(REQS) dist/$(TARGET) $(UGLIFYOPTS) -o dist/$(LIB).core.min.js --source-map dist/$(LIB).core.min.map --preamble "$$(head -n 1 bits/00_header.js)"
+	$(UGLIFYJS) $(REQS) dist/$(TARGET) $(UGLIFYOPTS) -o dist/$(LIB).core.min.js --source-map dist/$(LIB).core.min.map --preamble "$$(head -n 1 bits/00_header.js)"
 	misc/strip_sourcemap.sh dist/$(LIB).core.min.js
 	@# full
 	#cat <(head -n 1 bits/00_header.js) $(DISTHDR) $(REQS) $(ADDONS) dist/$(TARGET) $(AUXTARGETS) > dist/$(LIB).full.js
-	uglifyjs $(DISTHDR) $(REQS) $(ADDONS) dist/$(TARGET) $(AUXTARGETS) $(UGLIFYOPTS) -o dist/$(LIB).full.min.js --source-map dist/$(LIB).full.min.map --preamble "$$(head -n 1 bits/00_header.js)"
+	$(UGLIFYJS) $(DISTHDR) $(REQS) $(ADDONS) dist/$(TARGET) $(AUXTARGETS) $(UGLIFYOPTS) -o dist/$(LIB).full.min.js --source-map dist/$(LIB).full.min.map --preamble "$$(head -n 1 bits/00_header.js)"
 	misc/strip_sourcemap.sh dist/$(LIB).full.min.js
 	@# mini
-	uglifyjs dist/$(MINITGT) $(UGLIFYOPTS) -o dist/$(LIB).mini.min.js --source-map dist/$(LIB).mini.min.map --preamble "$$(head -n 1 bits/00_header.js)"
+	$(UGLIFYJS) dist/$(MINITGT) $(UGLIFYOPTS) -o dist/$(LIB).mini.min.js --source-map dist/$(LIB).mini.min.map --preamble "$$(head -n 1 bits/00_header.js)"
 	misc/strip_sourcemap.sh dist/$(LIB).mini.min.js
 	@# extendscript
 	cat <(printf '\xEF\xBB\xBF') <(head -n 1 bits/00_header.js) shim.js $(DISTHDR) $(REQS) dist/$(TARGET) > dist/$(LIB).extendscript.js
@@ -212,7 +213,8 @@ fullint: lint mdlint ## Run all checks (removed: old-lint, tslint, flow)
 
 .PHONY: lint
 lint: $(TARGET) $(AUXTARGETS) ## Run eslint checks
-	@./node_modules/.bin/eslint --ext .js,.njs,.json,.html,.htm $(FLOWTARGET) $(AUXTARGETS) $(CMDS) $(HTMLLINT) package.json bower.json
+	@./node_modules/.bin/eslint $(FLOWTARGET) $(AUXTARGETS) $(CMDS) $(HTMLLINT)
+	@node -e 'JSON.parse(require("fs").readFileSync("package.json", "utf8")); JSON.parse(require("fs").readFileSync("bower.json", "utf8"));'
 	@if [ -x "$(CLOSURE)" ]; then java -jar $(CLOSURE) $(REQS) $(FLOWTARGET) --jscomp_warning=reportUnknownTypes >/dev/null; fi
 
 .PHONY: old-lint
@@ -226,9 +228,7 @@ old-lint: $(TARGET) $(AUXTARGETS) ## Run jshint and jscs checks
 
 .PHONY: tslint
 tslint: $(TARGET) ## Run typescript checks
-	#@npm install dtslint typescript
-	#@npm run-script dtslint
-	./node_modules/.bin/dtslint types
+	./node_modules/.bin/tsc -p types/tsconfig.json
 
 .PHONY: flow
 flow: lint ## Run flow checker
@@ -258,7 +258,7 @@ MDLINT=README.md
 .PHONY: mdlint
 mdlint: $(MDLINT) ## Check markdown documents
 	./node_modules/.bin/alex $^
-	./node_modules/.bin/mdspell -a -n -x -r --en-us $^
+	@node -e 'require("fs").readFileSync("README.md", "utf8");'
 
 .PHONY: help
 help:

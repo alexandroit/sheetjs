@@ -6,9 +6,15 @@
     <title>@stackline/xlsx Documentation</title>
     <meta
       name="description"
-      content="Public documentation for @stackline/xlsx, a maintained SheetJS-compatible spreadsheet parser and writer with security hardening."
+      content="Public documentation for @stackline/xlsx 1.0.3, a maintained SheetJS-compatible spreadsheet parser and writer with security hardening."
+    />
+    <meta
+      name="keywords"
+      content="xlsx, SheetJS, spreadsheet parser, Excel export, CSV, ODS, security hardened, prototype pollution, ReDoS, Stackline"
     />
     <link rel="stylesheet" href="./site.css" />
+    <link rel="llms" href="./llms.txt" />
+    <link rel="llms-full" href="./llms-full.txt" />
   </head>
   <body>
     <header class="site-header">
@@ -64,7 +70,7 @@
       <section class="summary">
         <div>
           <strong>Version</strong>
-          <span>1.0.2</span>
+          <span>1.0.3</span>
         </div>
         <div>
           <strong>API target</strong>
@@ -85,7 +91,7 @@
           <p class="eyebrow">Install</p>
           <h2>Use the scoped package directly.</h2>
         </div>
-        <pre><code>npm install @stackline/xlsx</code></pre>
+        <pre><code>npm install @stackline/xlsx@1.0.3 --save-exact</code></pre>
         <p>
           Existing apps that must keep
           <code>import * as XLSX from 'xlsx'</code> can use npm alias migration.
@@ -183,7 +189,7 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
           <h2>Public release checklist.</h2>
         </div>
         <ul class="checklist">
-          <li>Published as <code>@stackline/xlsx@1.0.2</code> on npm.</li>
+          <li>Published as <code>@stackline/xlsx@1.0.3</code> on npm.</li>
           <li>Run <code>npm ci</code>.</li>
           <li>Run <code>npm test</code>.</li>
           <li>Run <code>npm run build</code>.</li>
@@ -192,10 +198,42 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
           <li>Smoke test direct scoped usage and npm alias migration.</li>
         </ul>
       </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">1.0.3 maintenance release</p>
+          <h2>Security tooling refreshed, runtime API preserved.</h2>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <h3>Audit cleanup</h3>
+            <p>
+              Development dependencies were refreshed and abandoned audit
+              sources were removed from the release flow.
+            </p>
+          </article>
+          <article>
+            <h3>Modern checks</h3>
+            <p>
+              ESLint and TypeScript checks now run on maintained tooling while
+              preserving the existing public workbook API.
+            </p>
+          </article>
+          <article>
+            <h3>HTML hidden rows</h3>
+            <p>
+              HTML table import now detects hidden rows declared through CSS
+              rules in modern DOM environments.
+            </p>
+          </article>
+        </div>
+      </section>
     </main>
 
     <footer>
       <p>
+        <a href="./llms.txt">llms.txt</a> ·
+        <a href="./llms-full.txt">llms-full.txt</a> ·
         <a href="https://github.com/alexandroit/sheetjs/blob/github/LICENSE">Apache-2.0</a>.
         Maintained by Stackline as an independent fork of SheetJS Community
         Edition.
