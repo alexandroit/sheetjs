@@ -3060,7 +3060,7 @@ var mfopts = opts;
 var mft = fs.readFileSync('multiformat.lst','utf-8').replace(/\r/g,"").split("\n").map(function(x) { return x.trim(); });
 var csv = true, formulae = false;
 for(var mfti = 0; mfti < mft.length; ++mfti) { var x = mft[mfti];
-	if(x.charAt(0)!="#") await t.step('MFT ' + x, async function(t) {
+	if(x.charAt(0)!="#") { const mftcsv = csv, mftformulae = formulae; await t.step('MFT ' + x, async function(t) {
 		var f: Array<X.WorkBook> = [], r = x.split(/\s+/);
 		if(r.length < 3) return;
 		if(!fs.existsSync(dir + r[0] + r[1])) return;
@@ -3082,19 +3082,19 @@ for(var mfti = 0; mfti < mft.length; ++mfti) { var x = mft[mfti];
 				cmparr(ss.map(function(s) { return (s['!merges']||[]).map(function(y) { return X.utils.encode_range(y); }).sort(); }));
 			});
 		});
-		if(csv) await t.step('should have the same CSV', async function(t) {
+		if(mftcsv) await t.step('should have the same CSV', async function(t) {
 			cmparr(f.map(function(x) { return x.SheetNames; }));
 			f[0].SheetNames.forEach(function(name) {
 				cmparr(f.map(function(x) { return X.utils.sheet_to_csv(x.Sheets[name]); }));
 			});
 		});
-		if(formulae) await t.step('should have the same formulae', async function(t) {
+		if(mftformulae) await t.step('should have the same formulae', async function(t) {
 			cmparr(f.map(function(x) { return x.SheetNames; }));
 			f[0].SheetNames.forEach(function(name: string) {
 				cmparr(f.map(function(x) { return X.utils.sheet_to_formulae(x.Sheets[name]).sort(); }));
 			});
 		});
-	});
+	}); }
 	else x.split(/\s+/).forEach(function(w: string) { switch(w) {
 		case "no-csv": csv = false; break;
 		case "yes-csv": csv = true; break;
