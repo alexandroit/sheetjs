@@ -41,9 +41,9 @@ import * as XLSX from 'xlsx';
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
 - Working branch: `github`
 - Base: SheetJS Community Edition `v0.20.3`
-- Next public npm target version: `1.0.4`
+- Current package version: `1.0.4`
 - Verdaccio `latest`: `1.0.4`
-- Official npm `latest`: `1.0.3`
+- Official npm `latest`: `1.0.4`
 - Package name: `@stackline/xlsx`
 - Current security scope:
   - GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533
@@ -67,8 +67,8 @@ import * as XLSX from 'xlsx';
 - Published `@stackline/xlsx@1.0.1` to Verdaccio during internal polishing.
 - Published `@stackline/xlsx@1.0.2` and `@stackline/xlsx@1.0.3` to Verdaccio
   and public npm before the upstream `0.20.3` merge.
-- Published `@stackline/xlsx@1.0.4` to Verdaccio only after merging SheetJS CE
-  `v0.20.3`; public npm remains on `1.0.3`.
+- Published `@stackline/xlsx@1.0.4` to Verdaccio and public npm after
+  merging SheetJS CE `v0.20.3` and passing local and GitHub validation.
 - Replaced the internal Verdaccio `@stackline/xlsx@1.0.0` tarball with the
   public-ready `1.0.0` tarball after removing the old Verdaccio-only metadata.
 - Confirmed Verdaccio `latest` points to `1.0.2`.
@@ -122,10 +122,7 @@ https://github.com/alexandroit/sheetjs/tree/github
 
 ## Current Round
 
-- Current focus: validate `@stackline/xlsx@1.0.4` from Verdaccio in a live
-  consumer app before any public npm publish.
-- Do not publish `1.0.4` to public npm until the Verdaccio/live validation is
-  accepted.
+- Current focus: `@stackline/xlsx@1.0.4` public npm release is complete.
 - `1.0.4` Verdaccio validation completed locally:
   - `npm run dtslint`: passed
   - `npm run build`: passed
@@ -137,6 +134,21 @@ https://github.com/alexandroit/sheetjs/tree/github
   - Live consumer app: `/storage/data/github/tests/xlsx-verdaccio-live`
   - Live consumer install from Verdaccio: `0 vulnerabilities`
   - Live consumer smoke/build: passed
+- `1.0.4` public npm release validation:
+  - local `npm test`: `74687 passing`, `2 pending`
+  - local Bun targeted regression: `FMTS=misc npx -y bun test test.test.mjs`
+    passed after fixing multiformat flag capture
+  - local `npm run dtslint`: passed
+  - local `npm pack --dry-run --json`: package tarball valid
+  - GitHub Actions on `github` at commit `c4a2016` passed:
+    - `Tests: pretest/posttest`
+    - `Tests: Bun`
+    - `Tests: deno 1.x`
+    - `Tests: node.js`
+  - official npm publish: `@stackline/xlsx@1.0.4`
+  - official npm `latest`: `1.0.4`
+  - official npm direct and alias smoke install: passed
+  - consumer `npm audit --omit=dev`: `0 vulnerabilities`
 - Historical validation notes below refer to earlier public releases unless
   explicitly marked `1.0.4`.
 - Keep the primary Verdaccio install experience as:
