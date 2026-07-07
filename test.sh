@@ -40,5 +40,3 @@ for TZ in ${TZONES[@]}; do
 	env TZ="$TZ" WTF=1 make test-deno_misc;
 	env TZ="$TZ" WTF=1 make test-denocp_misc;
 done
-
-

@@ -12,7 +12,7 @@ function pad_(v/*:any*/,d/*:number*/)/*:string*/{var t=""+v;return t.length>=d?t
 function rpad_(v/*:any*/,d/*:number*/)/*:string*/{var t=""+v; return t.length>=d?t:t+fill(' ',d-t.length);}
 function pad0r1(v/*:any*/,d/*:number*/)/*:string*/{var t=""+Math.round(v); return t.length>=d?t:fill('0',d-t.length)+t;}
 function pad0r2(v/*:any*/,d/*:number*/)/*:string*/{var t=""+v; return t.length>=d?t:fill('0',d-t.length)+t;}
-var p2_32 = Math.pow(2,32);
+var p2_32 = /*#__PURE__*/Math.pow(2,32);
 function pad0r(v/*:any*/,d/*:number*/)/*:string*/{if(v>p2_32||v<-p2_32) return pad0r1(v,d); var i = Math.round(v); return pad0r2(i,d); }
 function isgeneral(s/*:string*/, i/*:?number*/)/*:boolean*/ { i = i || 0; return s.length >= 7 + i && (s.charCodeAt(i)|32) === 103 && (s.charCodeAt(i+1)|32) === 101 && (s.charCodeAt(i+2)|32) === 110 && (s.charCodeAt(i+3)|32) === 101 && (s.charCodeAt(i+4)|32) === 114 && (s.charCodeAt(i+5)|32) === 97 && (s.charCodeAt(i+6)|32) === 108; }
 /*::
@@ -42,6 +42,7 @@ var months/*:Array<Array<string> >*/ = [
 	['D', 'Dec', 'December']
 ];
 function init_table(t/*:any*/) {
+	if(!t) t = {};
 	t[0]=  'General';
 	t[1]=  '0';
 	t[2]=  '0.00';
@@ -71,6 +72,7 @@ function init_table(t/*:any*/) {
 	t[48]= '##0.0E+0';
 	t[49]= '@';
 	t[56]= '"上午/下午 "hh"時"mm"分"ss"秒 "';
+	return t;
 }
 
 var table_fmt = {};
@@ -252,6 +254,7 @@ var general_fmt_num = (function make_general_fmt_num() {
 	}
 
 	function general_fmt_num_base(v/*:number*/)/*:string*/ {
+		if(!isFinite(v)) return isNaN(v) ? "#NUM!" : "#DIV/0!";
 		var V = Math.floor(Math.log(Math.abs(v))*Math.LOG10E), o;
 
 		if(V >= -4 && V <= -1) o = v.toPrecision(10+V);
@@ -417,7 +420,7 @@ function write_num_f2(r/*:Array<string>*/, aval/*:number*/, sign/*:string*/)/*:s
 	return sign + (aval === 0 ? "" : ""+aval) + fill(" ", r[1].length + 2 + r[4].length);
 }
 var dec1 = /^#*0*\.([0#]+)/;
-var closeparen = /\).*[0#]/;
+var closeparen = /\)[^)]*[0#]/;
 var phone = /\(###\) ###\\?-####/;
 function hashq(str/*:string*/)/*:string*/ {
 	var o = "", cc;
@@ -951,6 +954,8 @@ function choose_fmt(f/*:string*/, v/*:any*/) {
 	if(l<4 && lat>-1) --l;
 	if(fmt.length > 4) throw new Error("cannot find right format for |" + fmt.join("|") + "|");
 	if(typeof v !== "number") return [4, fmt.length === 4 || lat>-1?fmt[fmt.length-1]:"@"];
+	/* NOTE: most spreadsheet software do not support NaN or infinities */
+	if(typeof v === "number" && !isFinite(v)) v = 0;
 	switch(fmt.length) {
 		case 1: fmt = lat>-1 ? ["General", "General", "General", fmt[0]] : [fmt[0], fmt[0], fmt[0], "@"]; break;
 		case 2: fmt = lat>-1 ? [fmt[0], fmt[0], fmt[0], fmt[1]] : [fmt[0], fmt[1], fmt[0], "@"]; break;
@@ -987,6 +992,8 @@ function format(fmt/*:string|number*/,v/*:any*/,o/*:?any*/) {
 	if(isgeneral(f[1])) return general_fmt(v, o);
 	if(v === true) v = "TRUE"; else if(v === false) v = "FALSE";
 	else if(v === "" || v == null) return "";
+	else if(isNaN(v) && f[1].indexOf("0") > -1) return "#NUM!";
+	else if(!isFinite(v) && f[1].indexOf("0") > -1) return "#DIV/0!";
 	return eval_fmt(f[1], v, o, f[0]);
 }
 function load_entry(fmt/*:string*/, idx/*:?number*/)/*:number*/ {

@@ -42,7 +42,9 @@ type CFBFiles = {[n:string]:CFBEntry};
 var CRC32 = /*#__PURE__*/(function() {
 var CRC32 = {};
 CRC32.version = '1.2.0';
-/* see perf/crc32table.js */
+/*::
+type CRC32TableType = Array<number> | Int32Array;
+*/
 /*global Int32Array */
 function signed_crc_table()/*:any*/ {
 	var c = 0, table/*:Array<number>*/ = new Array(256);
@@ -80,7 +82,7 @@ var TT = slice_by_16_tables(T0);
 var T1 = TT[0],  T2 = TT[1],  T3 = TT[2],  T4 = TT[3],  T5 = TT[4];
 var T6 = TT[5],  T7 = TT[6],  T8 = TT[7],  T9 = TT[8],  Ta = TT[9];
 var Tb = TT[10], Tc = TT[11], Td = TT[12], Te = TT[13], Tf = TT[14];
-function crc32_bstr(bstr/*:string*/, seed/*:number*/)/*:number*/ {
+function crc32_bstr(bstr/*:string*/, seed/*:?number*/)/*:number*/ {
 	var C = seed/*:: ? 0 : 0 */ ^ -1;
 	for(var i = 0, L = bstr.length; i < L;) C = (C>>>8) ^ T0[(C^bstr.charCodeAt(i++))&0xFF];
 	return ~C;
@@ -1446,8 +1448,8 @@ function parse_local_file(blob/*:CFBlob*/, csz/*:number*/, usz/*:number*/, o/*:C
 		if((ef[0x0001]||{}).csz) _csz = ef[0x0001].csz;
 		if(EF) {
 			if((EF[0x5455]||{}).mt) date = EF[0x5455].mt;
-			if((EF[0x0001]||{}).usz) _usz = ef[0x0001].usz;
-			if((EF[0x0001]||{}).csz) _csz = ef[0x0001].csz;
+			if((EF[0x0001]||{}).usz) _usz = EF[0x0001].usz;
+			if((EF[0x0001]||{}).csz) _csz = EF[0x0001].csz;
 		}
 	}
 	blob.l += efsz;
@@ -1458,7 +1460,7 @@ function parse_local_file(blob/*:CFBlob*/, csz/*:number*/, usz/*:number*/, o/*:C
 	var data = blob.slice(blob.l, blob.l + _csz);
 	switch(meth) {
 		case 8: data = _inflateRawSync(blob, _usz); break;
-		case 0: break; // TODO: scan for magic number
+		case 0: blob.l += _csz; break; // TODO: scan for magic number
 		default: throw new Error("Unsupported ZIP Compression method " + meth);
 	}
 
@@ -1493,8 +1495,9 @@ function write_zip(cfb/*:CFBContainer*/, options/*:CFBWriteOpts*/)/*:RawBytes*/ 
 
 	for(i = 1; i < cfb.FullPaths.length; ++i) {
 		fp = cfb.FullPaths[i].slice(root.length); fi = cfb.FileIndex[i];
-		if(!fi.size || !fi.content || fp == "\u0001Sh33tJ5") continue;
+		if(!fi.size || !fi.content || (Array.isArray(fi.content) && fi.content.length == 0) || fp == "\u0001Sh33tJ5") continue;
 		var start = start_cd;
+
 
 		/* TODO: CP437 filename */
 		var namebuf = new_buf(fp.length);

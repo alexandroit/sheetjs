@@ -62,7 +62,7 @@ function parse_ws_xml(data/*:?string*/, opts, idx/*:number*/, rels, wb/*:WBWBPro
 	var merges/*:Array<Range>*/ = [];
 	var _merge = data2.match(mergecregex);
 	if(_merge) for(ridx = 0; ridx != _merge.length; ++ridx)
-		merges[ridx] = safe_decode_range(_merge[ridx].slice(_merge[ridx].indexOf("\"")+1));
+		merges[ridx] = safe_decode_range(_merge[ridx].slice(_merge[ridx].indexOf("=")+2));
 
 	/* 18.3.1.48 hyperlinks CT_Hyperlinks */
 	var hlink = data2.match(hlinkregex);
@@ -521,16 +521,17 @@ return function parse_ws_xml_data(sdata/*:string*/, s, opts, guess/*:Range*/, th
 
 function write_ws_xml_data(ws/*:Worksheet*/, opts, idx/*:number*/, wb/*:Workbook*//*::, rels*/)/*:string*/ {
 	var o/*:Array<string>*/ = [], r/*:Array<string>*/ = [], range = safe_decode_range(ws['!ref']), cell="", ref, rr = "", cols/*:Array<string>*/ = [], R=0, C=0, rows = ws['!rows'];
-	var dense = ws["!data"] != null;
+	var dense = ws["!data"] != null, data = dense ? ws["!data"] : [];
 	var params = ({r:rr}/*:any*/), row/*:RowInfo*/, height = -1;
 	var date1904 = (((wb||{}).Workbook||{}).WBProps||{}).date1904;
 	for(C = range.s.c; C <= range.e.c; ++C) cols[C] = encode_col(C);
 	for(R = range.s.r; R <= range.e.r; ++R) {
 		r = [];
 		rr = encode_row(R);
+		var data_R = dense ? data[R] : [];
 		for(C = range.s.c; C <= range.e.c; ++C) {
 			ref = cols[C] + rr;
-			var _cell = dense ? (ws["!data"][R]||[])[C]: ws[ref];
+			var _cell = dense ? data_R[C] : ws[ref];
 			if(_cell === undefined) continue;
 			if((cell = write_ws_xml_cell(_cell, ref, ws, opts, idx, wb, date1904)) != null) r.push(cell);
 		}

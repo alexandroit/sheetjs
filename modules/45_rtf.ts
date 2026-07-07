@@ -12,6 +12,7 @@ declare function a2s(a: any): string;
 declare var has_buf: boolean;
 declare function Base64_decode(s: string): string;
 declare function fuzzynum(s: string): number;
+declare var RBErr: {[key: string]: number};
 
 function rtf_to_sheet(d: RawData, opts: ParsingOptions): WorkSheet {
 	switch(opts.type) {
@@ -54,7 +55,7 @@ function rtf_to_sheet_str(str: string, opts: ParsingOptions): WorkSheet {
 						var cell: CellObject = {v: payload.join(""), t:"s"};
 						if(cell.v == "TRUE" || cell.v == "FALSE") { cell.v = cell.v == "TRUE"; cell.t = "b"; }
 						else if(!isNaN(fuzzynum(cell.v as string))) { cell.t = 'n'; if(o.cellText !== false) cell.w = cell.v as string; cell.v = fuzzynum(cell.v as string); }
-
+						else if(RBErr[cell.v as string] != null) { cell.t = "e"; cell.w = cell.v as string; cell.v = RBErr[cell.v as string]; }
 						if(dense) row[C] = cell;
 						else (ws as SparseSheet)[encode_cell({r:R, c:C})] = cell;
 					}

@@ -48,6 +48,8 @@ function html_to_sheet(str/*:string*/, _opts)/*:Workbook*/ {
 				if(opts.UTC === false) o.v = utc_to_local(o.v);
 				if(!opts.cellDates) o = ({t:'n', v:datenum(o.v)}/*:any*/);
 				o.z = opts.dateNF || table_fmt[14];
+			} else if(m.charCodeAt(0) == 35 /* # */ && RBErr[m] != null) {
+				o.t = 'e'; o.w = m; o.v = RBErr[m];
 			}
 			if(o.cellText !== false) o.w = m;
 			if(dense) { if(!ws["!data"][R]) ws["!data"][R] = []; ws["!data"][R][C] = o; }
@@ -75,6 +77,10 @@ function make_html_row(ws/*:Worksheet*/, r/*:Range*/, R/*:number*/, o/*:Sheet2HT
 		if(RS < 0) continue;
 		var coord = encode_col(C) + encode_row(R);
 		var cell = dense ? (ws["!data"][R]||[])[C] : ws[coord];
+		if(cell && cell.t == 'n' && cell.v != null && !isFinite(cell.v)) {
+			if(isNaN(cell.v)) cell = ({t:'e', v:0x24, w:BErr[0x24]});
+			else cell = ({t:'e', v:0x07, w:BErr[0x07]});
+		}
 		/* TODO: html entities */
 		var w = (cell && cell.v != null) && (cell.h || escapehtml(cell.w || (format_cell(cell), cell.w) || "")) || "";
 		sp = ({}/*:any*/);
@@ -185,6 +191,7 @@ function sheet_add_dom(ws/*:Worksheet*/, table/*:HTMLElement*/, _opts/*:?any*/)/
 			if(v != null) {
 				if(v.length == 0) o.t = _t || 'z';
 				else if(opts.raw || v.trim().length == 0 || _t == "s"){}
+				else if(_t == "e" && BErr[+v]) o = {t:'e', v:+v, w: BErr[+v]};
 				else if(v === 'TRUE') o = {t:'b', v:true};
 				else if(v === 'FALSE') o = {t:'b', v:false};
 				else if(!isNaN(fuzzynum(v))) o = {t:'n', v:fuzzynum(v)};
@@ -193,7 +200,7 @@ function sheet_add_dom(ws/*:Worksheet*/, table/*:HTMLElement*/, _opts/*:?any*/)/
 					if(opts.UTC) o.v = local_to_utc(o.v);
 					if(!opts.cellDates) o = ({t:'n', v:datenum(o.v)}/*:any*/);
 					o.z = opts.dateNF || table_fmt[14];
-				}
+				} else if(v.charCodeAt(0) == 35 /* # */ && RBErr[v] != null) o = ({t:'e', v: RBErr[v], w: v});
 			}
 			if(o.z === undefined && z != null) o.z = z;
 			/* The first link is used.  Links are assumed to be fully specified.

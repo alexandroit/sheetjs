@@ -598,7 +598,6 @@ var WK_ = /*#__PURE__*/(function() {
 		else console.error("WK1 bad formula parse |" + out.join("|") + "|");
 	}
 
-
 	function parse_cell_3(blob/*::, length*/) {
 		var o = [{c:0,r:0}, {t:'n',v:0}, 0];
 		o[0].r = blob.read_shift(2); o[3] = blob[blob.l++]; o[0].c = blob[blob.l++];

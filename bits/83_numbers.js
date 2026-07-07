@@ -1117,7 +1117,7 @@ function s5s_to_iwa_comment(s5s) {
   return out;
 }
 function parse_TST_TableModelArchive(M, root, ws, opts) {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
   var pb = parse_shallow(root.data);
   var range = { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
   range.e.r = (varint_to_i32(pb[6][0].data) >>> 0) - 1;
@@ -1195,6 +1195,38 @@ function parse_TST_TableModelArchive(M, root, ws, opts) {
         }
       };
     });
+  }
+  if (!((_k = ws["!merges"]) == null ? void 0 : _k.length) && ((_l = pb[47]) == null ? void 0 : _l[0])) {
+    var merge_owner = parse_shallow(pb[47][0].data);
+    if ((_m = merge_owner[2]) == null ? void 0 : _m[0]) {
+      var formula_store = parse_shallow(merge_owner[2][0].data);
+      if ((_n = formula_store[3]) == null ? void 0 : _n[0]) {
+        ws["!merges"] = mappa(formula_store[3], function(u) {
+          var _a2, _b2, _c2, _d2, _e2;
+          var formula_pair = parse_shallow(u);
+          var formula = parse_shallow(formula_pair[2][0].data);
+          var AST_node_array = parse_shallow(formula[1][0].data);
+          if (!((_a2 = AST_node_array[1]) == null ? void 0 : _a2[0]))
+            return;
+          var AST_node0 = parse_shallow(AST_node_array[1][0].data);
+          var AST_node_type = varint_to_i32(AST_node0[1][0].data);
+          if (AST_node_type != 67)
+            return;
+          var AST_colon_tract = parse_shallow(AST_node0[40][0].data);
+          if (!((_b2 = AST_colon_tract[3]) == null ? void 0 : _b2[0]) || !((_c2 = AST_colon_tract[4]) == null ? void 0 : _c2[0]))
+            return;
+          var colrange = parse_shallow(AST_colon_tract[3][0].data);
+          var rowrange = parse_shallow(AST_colon_tract[4][0].data);
+          var c = varint_to_i32(colrange[1][0].data);
+          var C = ((_d2 = colrange[2]) == null ? void 0 : _d2[0]) ? varint_to_i32(colrange[2][0].data) : c;
+          var r = varint_to_i32(rowrange[1][0].data);
+          var R = ((_e2 = rowrange[2]) == null ? void 0 : _e2[0]) ? varint_to_i32(rowrange[2][0].data) : r;
+          return { s: { r: r, c: c }, e: { r: R, c: C } };
+        }).filter(function(x) {
+          return x != null;
+        });
+      }
+    }
   }
 }
 function parse_TST_TableInfoArchive(M, root, opts) {

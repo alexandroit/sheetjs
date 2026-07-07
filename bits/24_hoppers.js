@@ -20,7 +20,8 @@ function recordhopper(data, cb/*:RecordHopperCB*/, opts/*:?any*/) {
 
 /* control buffer usage for fixed-length buffers */
 function buf_array()/*:BufArray*/ {
-	var bufs/*:Array<Block>*/ = [], blksz = has_buf ? 256 : 2048;
+	var bufs/*:Array<Block>*/ = [], blksz = has_buf ? 16384 : 2048;
+	var has_buf_copy = has_buf && (typeof new_buf(blksz).copy == "function");
 	var newblk = function ba_newblk(sz/*:number*/)/*:Block*/ {
 		var o/*:Block*/ = (new_buf(sz)/*:any*/);
 		prep_blob(o, 0);
@@ -49,10 +50,15 @@ function buf_array()/*:BufArray*/ {
 		endbuf();
 		return bconcat(bufs);
 	};
+	var end2 = function() {
+		endbuf(); return bufs;
+	};
 
-	var push = function ba_push(buf) { endbuf(); curbuf = buf; if(curbuf.l == null) curbuf.l = curbuf.length; next(blksz); };
+	var push = function ba_push(buf) {
+		endbuf(); curbuf = buf; if(curbuf.l == null) curbuf.l = curbuf.length; next(blksz);
+	};
 
-	return ({ next:next, push:push, end:end, _bufs:bufs }/*:any*/);
+	return ({ next:next, push:push, end:end, _bufs:bufs, end2:end2 }/*:any*/);
 }
 
 function write_record(ba/*:BufArray*/, type/*:number*/, payload, length/*:?number*/) {

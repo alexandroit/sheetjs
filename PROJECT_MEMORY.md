@@ -40,10 +40,10 @@ import * as XLSX from 'xlsx';
 - Repository clone: `/storage/data/github/sheetjs-fork/sheetjs`
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
 - Working branch: `github`
-- Base: SheetJS Community Edition `v0.20.2`
-- Public npm target version: `1.0.2`
-- Verdaccio `latest`: `1.0.2`
-- Official npm `latest`: `1.0.2`
+- Base: SheetJS Community Edition `v0.20.3`
+- Next public npm target version: `1.0.4`
+- Verdaccio `latest`: `1.0.4`
+- Official npm `latest`: `1.0.3`
 - Package name: `@stackline/xlsx`
 - Current security scope:
   - GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533
@@ -65,6 +65,10 @@ import * as XLSX from 'xlsx';
 - Published `@stackline/xlsx@0.20.2-stackline.1` to Verdaccio.
 - Published `@stackline/xlsx@1.0.0` to Verdaccio.
 - Published `@stackline/xlsx@1.0.1` to Verdaccio during internal polishing.
+- Published `@stackline/xlsx@1.0.2` and `@stackline/xlsx@1.0.3` to Verdaccio
+  and public npm before the upstream `0.20.3` merge.
+- Published `@stackline/xlsx@1.0.4` to Verdaccio only after merging SheetJS CE
+  `v0.20.3`; public npm remains on `1.0.3`.
 - Replaced the internal Verdaccio `@stackline/xlsx@1.0.0` tarball with the
   public-ready `1.0.0` tarball after removing the old Verdaccio-only metadata.
 - Confirmed Verdaccio `latest` points to `1.0.2`.
@@ -118,13 +122,23 @@ https://github.com/alexandroit/sheetjs/tree/github
 
 ## Current Round
 
-- Published `@stackline/xlsx@1.0.0` to the official npm registry.
-- Published `@stackline/xlsx@1.0.1` to the official npm registry after CI
-  modernization and single-branch cleanup.
-- Published `@stackline/xlsx@1.0.2` to the official npm registry after fixing
-  the public Apache-2.0 license links in README and docs.
-- Verified Verdaccio resolves `@stackline/xlsx@1.0.2` and exposes `latest:
-  1.0.2`.
+- Current focus: validate `@stackline/xlsx@1.0.4` from Verdaccio in a live
+  consumer app before any public npm publish.
+- Do not publish `1.0.4` to public npm until the Verdaccio/live validation is
+  accepted.
+- `1.0.4` Verdaccio validation completed locally:
+  - `npm run dtslint`: passed
+  - `npm run build`: passed
+  - `make dist`: passed
+  - `npm audit --omit=dev`: `0 vulnerabilities`
+  - `npm test`: `74687 passing`, `2 pending`
+  - `npm pack --dry-run --json`: package tarball valid
+  - Verdaccio publish: `@stackline/xlsx@1.0.4`
+  - Live consumer app: `/storage/data/github/tests/xlsx-verdaccio-live`
+  - Live consumer install from Verdaccio: `0 vulnerabilities`
+  - Live consumer smoke/build: passed
+- Historical validation notes below refer to earlier public releases unless
+  explicitly marked `1.0.4`.
 - Keep the primary Verdaccio install experience as:
 
 ```bash
@@ -377,11 +391,9 @@ prototype pollution and ReDoS advisories.
 
 ### 1. Public npm polish
 
-- Change README primary install command to `npm install @stackline/xlsx`.
-- Move `xlsx@npm:@stackline/xlsx` into a migration section.
-- Use clean public SemVer before npm publication, preferably `1.0.0` if the
-  package is positioned as an official Stackline-maintained package.
-- Keep changelog notes saying the release is based on SheetJS CE `0.20.2`.
+- Keep README primary install command as `npm install @stackline/xlsx`.
+- Keep `xlsx@npm:@stackline/xlsx` in a migration section.
+- Keep changelog notes current with the upstream base used by the release.
 
 ### 2. Centralize security helpers
 

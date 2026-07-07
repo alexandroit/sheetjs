@@ -39,7 +39,7 @@ function write_num_f2(r/*:Array<string>*/, aval/*:number*/, sign/*:string*/)/*:s
 	return sign + (aval === 0 ? "" : ""+aval) + fill(" ", r[1].length + 2 + r[4].length);
 }
 var dec1 = /^#*0*\.([0#]+)/;
-var closeparen = /\).*[0#]/;
+var closeparen = /\)[^)]*[0#]/;
 var phone = /\(###\) ###\\?-####/;
 function hashq(str/*:string*/)/*:string*/ {
 	var o = "", cc;

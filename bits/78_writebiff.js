@@ -105,7 +105,7 @@ function write_ws_biff2(ba/*:BufArray*/, ws/*:Worksheet*/, idx/*:number*/, opts,
 	if(range.e.c > 0xFF || range.e.r > 0x3FFF) {
 		if(opts.WTF) throw new Error("Range " + (ws['!ref'] || "A1") + " exceeds format limit A1:IV16384");
 		range.e.c = Math.min(range.e.c, 0xFF);
-		range.e.r = Math.min(range.e.c, 0x3FFF);
+		range.e.r = Math.min(range.e.r, 0x3FFF);
 	}
 	var date1904 = (((wb||{}).Workbook||{}).WBProps||{}).date1904;
 	var row = [], comments = [];
@@ -515,9 +515,9 @@ function write_ws_biff8(idx/*:number*/, opts, wb/*:Workbook*/) {
 	var range = safe_decode_range(ws['!ref'] || "A1");
 	var MAX_ROWS = b8 ? 65536 : 16384;
 	if(range.e.c > 0xFF || range.e.r >= MAX_ROWS) {
-		if(opts.WTF) throw new Error("Range " + (ws['!ref'] || "A1") + " exceeds format limit A1:IV16384");
+		if(opts.WTF) throw new Error("Range " + (ws['!ref'] || "A1") + " exceeds format limit A1:IV" + MAX_ROWS);
 		range.e.c = Math.min(range.e.c, 0xFF);
-		range.e.r = Math.min(range.e.c, MAX_ROWS-1);
+		range.e.r = Math.min(range.e.r, MAX_ROWS-1);
 	}
 
 	write_biff_rec(ba, 0x0809, write_BOF(wb, 0x10, opts));
@@ -552,12 +552,11 @@ function write_ws_biff8(idx/*:number*/, opts, wb/*:Workbook*/) {
 		if(dense) row = ws["!data"][R] || [];
 		rr = encode_row(R);
 		for(C = range.s.c; C <= range.e.c; ++C) {
-			ref = cols[C] + rr;
-			var cell = dense ? row[C] : ws[ref];
+			var cell = dense ? row[C] : ws[cols[C] + rr];
 			if(!cell) continue;
 			/* write cell */
 			write_ws_biff8_cell(ba, cell, R, C, opts, date1904);
-			if(b8 && cell.l) ws['!links'].push([ref, cell.l]);
+			if(b8 && cell.l) ws['!links'].push([cols[C] + rr, cell.l]);
 			if(cell.c) comments.push([cell.c, R, C]);
 		}
 	}
@@ -700,6 +699,9 @@ function write_biff_buf(wb/*:Workbook*/, opts/*:WriteOpts*/) {
 		var range = decode_range(ws["!ref"]);
 		if(range.e.c > 255) { // note: 255 is IV
 			if(typeof console != "undefined" && console.error) console.error("Worksheet '" + wb.SheetNames[i] + "' extends beyond column IV (255).  Data may be lost.");
+		}
+		if(range.e.r > 65535) {
+			if(typeof console != "undefined" && console.error) console.error("Worksheet '" + wb.SheetNames[i] + "' extends beyond row 65536.  Data may be lost.");
 		}
 	}
 

@@ -4,6 +4,15 @@ This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.
 
+## v1.0.4
+
+* Incorporated SheetJS Community Edition `v0.20.3` functional updates:
+  NUMBERS / ODS merge parsing fixes, NaN / Infinity handling, XLML streaming
+  write support, `Int8Array` input parsing and CSV leading-ID quoting.
+* Preserved Stackline security hardening for prototype pollution and ReDoS
+  regression coverage while merging the upstream parser and writer changes.
+* Prepared this version for Verdaccio validation before any public npm release.
+
 ## v1.0.3
 
 * Refreshed development security tooling and removed abandoned audit sources
@@ -74,6 +83,14 @@ changes may not be included if they are not expected to break existing code.
 * Added regression tests for GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533.
 * Retained upstream v0.20.2 ReDoS hardening for GHSA-5pgg-2g8v-p4x9 /
   CVE-2024-22363 and added a malformed HTML regression test.
+
+## v0.20.3
+
+* Correct parsing of NUMBERS and ODS merge cells (h/t @s-ashwin)
+* More precise treatment of infinite and NaN values
+* XLML Streaming Write
+* Parse `Int8Array` objects (for compatibility with JS engines in Java)
+* CSV Export only quote leading ID (h/t @lako12)
 
 ## v0.20.2
 

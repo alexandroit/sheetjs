@@ -54,7 +54,7 @@ if(!browser) {
 	for(var _fileAi = 0; _fileAi < _fileA.length; ++_fileAi) if(test_file(_fileA[_fileAi])) fileA.push(_fileA[_fileAi]);
 }
 
-var can_write_numbers = typeof Array.prototype.findIndex == "function" && typeof Uint8Array !== "undefined" && typeof Uint8Array.prototype.indexOf == "function";
+var can_write_numbers = typeof Set !== "undefined" && typeof Array.prototype.findIndex == "function" && typeof Uint8Array !== "undefined" && typeof Uint8Array.prototype.indexOf == "function";
 
 /* Excel enforces 31 character sheet limit, although technical file limit is 255 */
 function fixsheetname(x/*:string*/)/*:string*/ { return x.substr(0,31); }
@@ -799,6 +799,17 @@ describe('API', function() {
 			[ { l: { Target: 'https://123.com' }, v: 'url', t: 's' }, 'tom', 'xxx' ]
 		]);
 		if(assert.deepEqual) assert.deepEqual(data.A2, { l: { Target: 'https://123.com' }, v: 'url', t: 's' });
+	});
+	it('sheet_to_formulae', function() {
+		var ws = X.utils.aoa_to_sheet([
+			["a", "b", "c"],
+			[1, 2, 3],
+			[4, 5, 6]
+		], {dense: true});
+		ws["!data"][2][0].f = "2*B2";
+		ws["!data"][2][1].f = "B2+C2";
+		assert.equal(X.utils.sheet_to_formulae(ws).join("\n"), "A1='a\nB1='b\nC1='c\nA2=1\nB2=2\nC2=3\nA3=2*B2\nB3=B2+C2\nC3=6");
+		assert.equal(X.utils.sheet_to_formulae(ws, {values: false}).join("\n"), "A3=2*B2\nB3=B2+C2");
 	});
 	it('decode_range', function() {
 		var _c = "ABC", _r = "123", _C = "DEF", _R = "456";
@@ -1889,6 +1900,32 @@ describe('roundtrip features', function() {
 		assert.ok(wb7.Workbook.WBProps.date1904);
 	}); });
 
+	it('should handle numeric NaN and Infinity', function() {[
+		"xlsx", "xlsm", "xlsb", "xls", "biff5", "biff4", "biff3", "biff2", "xlml", "csv", "txt", "sylk", "html", "rtf", "prn", "eth", "ods", "fods"
+	].forEach(function(ext) {
+		var ws = {
+			"!data": [
+				[ { t: "s", v: "Inf+" }, { t: "n", v: Infinity } ],
+				[ { t: "s", v: "Inf-" }, { t: "n", v: -Infinity } ],
+				[ { t: "s", v: "NaN" },  { t: "n", v: NaN } ],
+			],
+			"!ref": "A1:B3"
+		};
+		var wb = X.utils.book_new(ws, "Sheet1");
+		var buf = X.write(wb, { type: TYPE, bookType: ext, numbers: XLSX_ZAHL });
+		var wb2 = X.read(buf, { type: TYPE, PRN: true });
+		var csv = X.utils.sheet_to_csv(wb2.Sheets.Sheet1).split(/[\r\n]+/);
+		assert.equal(csv.length, 3);
+		assert.equal(csv[0], "Inf+,#DIV/0!");
+		assert.equal(csv[1], "Inf-,#DIV/0!");
+		assert.equal(csv[2], "NaN,#NUM!");
+		assert.equal(wb2.Sheets.Sheet1.B1.t, "e");
+		assert.equal(wb2.Sheets.Sheet1.B2.t, "e");
+		assert.equal(wb2.Sheets.Sheet1.B3.t, "e");
+		assert.equal(wb2.Sheets.Sheet1.B1.v, 0x07);
+		assert.equal(wb2.Sheets.Sheet1.B2.v, 0x07);
+		assert.equal(wb2.Sheets.Sheet1.B3.v, 0x24);
+	}); });
 });
 
 //function password_file(x){return x.match(/^password.*\.xls$/); }
@@ -2324,7 +2361,7 @@ function plaintext_test(wb, raw) {
 	var sheet = wb.Sheets[wb.SheetNames[0]];
 	plaintext_val.forEach(function(x) {
 		var cell = get_cell(sheet, x[0]);
-		var tcval = x[2+(raw ? 1 : 0)];
+		var tcval = x[2+(!!raw ? 1 : 0)];
 		var type = raw ? 's' : x[1];
 		if(x.length == 1) { if(cell) { assert.equal(cell.t, 'z'); assert.ok(!cell.v); } return; }
 		assert.equal(cell.v, tcval); assert.equal(cell.t, type);
@@ -2683,6 +2720,8 @@ function get_dom_element(html) {
 		domelt.innerHTML = html;
 		if(document.body) document.body.appendChild(domelt);
 		inserted_dom_elements.push(domelt);
+		var elts = domelt.getElementsByTagName("TABLE");
+		if(elts && elts[0]) return elts[0];
 		return domelt.children[0];
 	}
 	if(!JSDOM) throw new Error("Browser test fail");
@@ -2815,6 +2854,30 @@ describe('HTML', function() {
 			var range = X.utils.decode_range(ws['!ref']||"A1");
 			assert.equal(range.e.c, expectedCellCount - 1);
 		});
+	});
+	if(domtest) it('should handle numeric NaN and Infinity', function() {
+		var ws = {
+			"!data": [
+				[ { t: "s", v: "Inf+" }, { t: "n", v: Infinity } ],
+				[ { t: "s", v: "Inf-" }, { t: "n", v: -Infinity } ],
+				[ { t: "s", v: "NaN" },  { t: "n", v: NaN } ],
+			],
+			"!ref": "A1:B3"
+		};
+		var wb = X.utils.book_new(ws, "Sheet1");
+		var str = X.write(wb, { type: "string", bookType: "html" });
+		var wb2 = X.utils.table_to_book(get_dom_element(str));
+		var csv = X.utils.sheet_to_csv(wb2.Sheets.Sheet1).split(/[\r\n]+/);
+		assert.equal(csv.length, 3);
+		assert.equal(csv[0], "Inf+,#DIV/0!");
+		assert.equal(csv[1], "Inf-,#DIV/0!");
+		assert.equal(csv[2], "NaN,#NUM!");
+		assert.equal(wb2.Sheets.Sheet1.B1.t, "e");
+		assert.equal(wb2.Sheets.Sheet1.B2.t, "e");
+		assert.equal(wb2.Sheets.Sheet1.B3.t, "e");
+		assert.equal(wb2.Sheets.Sheet1.B1.v, 0x07);
+		assert.equal(wb2.Sheets.Sheet1.B2.v, 0x07);
+		assert.equal(wb2.Sheets.Sheet1.B3.v, 0x24);
 	});
 });
 

@@ -67,6 +67,9 @@ function zipentries(zip) {
 
 function zip_add_file(zip, path, content) {
 	if(zip.FullPaths) {
+		if(Array.isArray(content) && typeof content[0] == "string") {
+			content = content.join("");
+		}
 		if(typeof content == "string") {
 			var res;
 			if(has_buf) res = Buffer_from(content);

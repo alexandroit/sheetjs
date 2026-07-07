@@ -38,6 +38,7 @@ var months = [
 	['D', 'Dec', 'December']
 ];
 function init_table(t) {
+	if(!t) t = {};
 	t[0]=  'General';
 	t[1]=  '0';
 	t[2]=  '0.00';
@@ -67,6 +68,7 @@ function init_table(t) {
 	t[48]= '##0.0E+0';
 	t[49]= '@';
 	t[56]= '"上午/下午 "hh"時"mm"分"ss"秒 "';
+	return t;
 }
 
 var table_fmt = {};
@@ -248,6 +250,7 @@ var general_fmt_num = (function make_general_fmt_num() {
 	}
 
 	function general_fmt_num_base(v) {
+		if(!isFinite(v)) return isNaN(v) ? "#NUM!" : "#DIV/0!";
 		var V = Math.floor(Math.log(Math.abs(v))*Math.LOG10E), o;
 
 		if(V >= -4 && V <= -1) o = v.toPrecision(10+V);
@@ -412,7 +415,7 @@ function write_num_f2(r, aval, sign) {
 	return sign + (aval === 0 ? "" : ""+aval) + fill(" ", r[1].length + 2 + r[4].length);
 }
 var dec1 = /^#*0*\.([0#]+)/;
-var closeparen = /\).*[0#]/;
+var closeparen = /\)[^)]*[0#]/;
 var phone = /\(###\) ###\\?-####/;
 function hashq(str) {
 	var o = "", cc;
@@ -943,6 +946,8 @@ function choose_fmt(f, v) {
 	if(l<4 && lat>-1) --l;
 	if(fmt.length > 4) throw new Error("cannot find right format for |" + fmt.join("|") + "|");
 	if(typeof v !== "number") return [4, fmt.length === 4 || lat>-1?fmt[fmt.length-1]:"@"];
+	/* NOTE: most spreadsheet software do not support NaN or infinities */
+	if(typeof v === "number" && !isFinite(v)) v = 0;
 	switch(fmt.length) {
 		case 1: fmt = lat>-1 ? ["General", "General", "General", fmt[0]] : [fmt[0], fmt[0], fmt[0], "@"]; break;
 		case 2: fmt = lat>-1 ? [fmt[0], fmt[0], fmt[0], fmt[1]] : [fmt[0], fmt[1], fmt[0], "@"]; break;
@@ -979,6 +984,8 @@ function format(fmt,v,o) {
 	if(isgeneral(f[1])) return general_fmt(v, o);
 	if(v === true) v = "TRUE"; else if(v === false) v = "FALSE";
 	else if(v === "" || v == null) return "";
+	else if(isNaN(v) && f[1].indexOf("0") > -1) return "#NUM!";
+	else if(!isFinite(v) && f[1].indexOf("0") > -1) return "#DIV/0!";
 	return eval_fmt(f[1], v, o, f[0]);
 }
 function load_entry(fmt, idx) {

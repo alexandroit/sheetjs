@@ -123,8 +123,8 @@ function parse_TypedPropertyValue(blob, type/*:number*/, _opts)/*:any*/ {
 		case 0x03 /*VT_I4*/: ret = blob.read_shift(4, 'i'); return ret;
 		case 0x0B /*VT_BOOL*/: return blob.read_shift(4) !== 0x0;
 		case 0x13 /*VT_UI4*/: ret = blob.read_shift(4); return ret;
-		case 0x1E /*VT_LPSTR*/: return parse_lpstr(blob, t, 4).replace(chr0,'');
-		case 0x1F /*VT_LPWSTR*/: return parse_lpwstr(blob);
+		case 0x1E /*VT_LPSTR*/: blob.l += 4; val = parse_VtString(blob, blob[blob.l-4]).replace(/(^|[^\u0000])\u0000+$/,"$1"); break;
+		case 0x1F /*VT_LPWSTR*/: blob.l += 4; val = parse_VtString(blob, blob[blob.l-4]).replace(/(^|[^\u0000])\u0000+$/,"$1"); break;
 		case 0x40 /*VT_FILETIME*/: return parse_FILETIME(blob);
 		case 0x41 /*VT_BLOB*/: return parse_BLOB(blob);
 		case 0x47 /*VT_CF*/: return parse_ClipboardData(blob);

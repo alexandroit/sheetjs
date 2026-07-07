@@ -1,4 +1,5 @@
 function init_table(t/*:any*/) {
+	if(!t) t = {};
 	t[0]=  'General';
 	t[1]=  '0';
 	t[2]=  '0.00';
@@ -28,6 +29,7 @@ function init_table(t/*:any*/) {
 	t[48]= '##0.0E+0';
 	t[49]= '@';
 	t[56]= '"上午/下午 "hh"時"mm"分"ss"秒 "';
+	return t;
 }
 
 var table_fmt = {};

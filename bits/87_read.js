@@ -75,6 +75,8 @@ function readSync(data/*:RawData*/, opts/*:?ParseOpts*/)/*:Workbook*/ {
 	var o = opts||{};
 	if(o.codepage && typeof $cptable === "undefined") console.error("Codepage tables are not loaded.  Non-ASCII characters may not give expected results");
 	if(typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer) return readSync(new Uint8Array(data), (o = dup(o), o.type = "array", o));
+	/* Javet projects `byte[]` to `Int8Array` */
+	if(typeof Int8Array !== 'undefined' && data instanceof Int8Array) return readSync(new Uint8Array(data.buffer, data.byteOffset, data.length), o);
 	if(typeof Uint8Array !== 'undefined' && data instanceof Uint8Array && !o.type) o.type = typeof Deno !== "undefined" ? "buffer" : "array";
 	var d = data, n = [0,0,0,0], str = false;
 	if(o.cellStyles) { o.cellNF = true; o.sheetStubs = true; }

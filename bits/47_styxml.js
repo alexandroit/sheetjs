@@ -163,10 +163,12 @@ function parse_fonts(t, styles, themes, opts) {
 			/* 18.8.2  b CT_BooleanProperty */
 			case '<b': font.bold = y.val ? parsexmlbool(y.val) : 1; break;
 			case '<b/>': font.bold = 1; break;
+			case '</b>': case '</b': break;
 
 			/* 18.8.26 i CT_BooleanProperty */
 			case '<i': font.italic = y.val ? parsexmlbool(y.val) : 1; break;
 			case '<i/>': font.italic = 1; break;
+			case '</i>': case '</i': break;
 
 			/* 18.4.13 u CT_UnderlineProperty */
 			case '<u':
@@ -178,48 +180,55 @@ function parse_fonts(t, styles, themes, opts) {
 					case "doubleAccounting": font.underline = 0x22; break;
 				} break;
 			case '<u/>': font.underline = 1; break;
+			case '</u>': case '</u': break;
 
 			/* 18.4.10 strike CT_BooleanProperty */
 			case '<strike': font.strike = y.val ? parsexmlbool(y.val) : 1; break;
 			case '<strike/>': font.strike = 1; break;
+			case '</strike>': case '</strike': break;
 
 			/* 18.4.2  outline CT_BooleanProperty */
 			case '<outline': font.outline = y.val ? parsexmlbool(y.val) : 1; break;
 			case '<outline/>': font.outline = 1; break;
+			case '</outline>': case '</outline': break;
 
 			/* 18.8.36 shadow CT_BooleanProperty */
 			case '<shadow': font.shadow = y.val ? parsexmlbool(y.val) : 1; break;
 			case '<shadow/>': font.shadow = 1; break;
+			case '</shadow>': case '</shadow': break;
 
 			/* 18.8.12 condense CT_BooleanProperty */
 			case '<condense': font.condense = y.val ? parsexmlbool(y.val) : 1; break;
 			case '<condense/>': font.condense = 1; break;
+			case '</condense>': case '</condense': break;
 
 			/* 18.8.17 extend CT_BooleanProperty */
 			case '<extend': font.extend = y.val ? parsexmlbool(y.val) : 1; break;
 			case '<extend/>': font.extend = 1; break;
+			case '</extend>': case '</extend': break;
 
 			/* 18.4.11 sz CT_FontSize */
 			case '<sz': if(y.val) font.sz = +y.val; break;
-			case '<sz/>': case '</sz>': break;
+			case '<sz/>': case '</sz>': case '</sz': break;
 
 			/* 18.4.14 vertAlign CT_VerticalAlignFontProperty */
 			case '<vertAlign': if(y.val) font.vertAlign = y.val; break;
-			case '<vertAlign/>': case '</vertAlign>': break;
+			case '<vertAlign/>': case '</vertAlign>': case '</vertAlign': break;
 
 			/* 18.8.18 family CT_FontFamily */
 			case '<family': if(y.val) font.family = parseInt(y.val,10); break;
-			case '<family/>': case '</family>': break;
+			case '<family/>': case '</family>': case '</family': break;
 
 			/* 18.8.35 scheme CT_FontScheme */
 			case '<scheme': if(y.val) font.scheme = y.val; break;
-			case '<scheme/>': case '</scheme>': break;
+			case '<scheme/>': case '</scheme>': case '</scheme': break;
 
 			/* 18.4.1 charset CT_IntProperty */
 			case '<charset':
 				if(y.val == '1') break;
 				y.codepage = CS2CP[parseInt(y.val, 10)];
 				break;
+			case '<charset/>': case '</charset>': case '</charset': break;
 
 			/* 18.?.? color CT_Color */
 			case '<color':
@@ -242,11 +251,11 @@ function parse_fonts(t, styles, themes, opts) {
 				}
 
 				break;
-			case '<color/>': case '</color>': break;
+			case '<color/>': case '</color>': case '</color': break;
 
 			/* note: sometimes mc:AlternateContent appears bare */
 			case '<AlternateContent': pass = true; break;
-			case '</AlternateContent>': pass = false; break;
+			case '</AlternateContent>': case '</AlternateContent': pass = false; break;
 
 			/* 18.2.10 extLst CT_ExtensionList ? */
 			case '<extLst': case '<extLst>': case '</extLst>': break;

@@ -593,7 +593,7 @@ var SYLK = /*#__PURE__*/(function() {
 		var o = "C;Y" + (R+1) + ";X" + (C+1) + ";K";
 		switch(cell.t) {
 			case 'n':
-				o += (cell.v||0);
+				o += isFinite(cell.v) ? (cell.v||0) : BErr[isNaN(cell.v) ? 0x24 : 0x07];
 				if(cell.f && !cell.F) o += ";E" + a1_to_rc(cell.f, {r:R, c:C}); break;
 			case 'b': o += cell.v ? "TRUE" : "FALSE"; break;
 			case 'e': o += cell.w || BErr[cell.v] || cell.v; break;
@@ -822,7 +822,7 @@ var ETH = /*#__PURE__*/(function() {
 				case 'vtc':
 					switch(record[3]) {
 						case 'nl': arr[R][C] = +record[4] ? true : false; break;
-						default: arr[R][C] = +record[4]; break;
+						default: arr[R][C] = record[record.length-1].charAt(0) == "#" ? ({t: "e", v: RBErr[record[record.length-1]] }) : +record[4]; break;
 					}
 					if(record[2] == 'vtf') arr[R][C] = [arr[R][C], _f];
 			}
@@ -865,11 +865,7 @@ var ETH = /*#__PURE__*/(function() {
 				if(!cell || cell.v == null || cell.t === 'z') continue;
 				oo = ["cell", coord, 't'];
 				switch(cell.t) {
-					case 's': case 'str': oo.push(encode(cell.v)); break;
-					case 'n':
-						if(!cell.f) { oo[2]='v'; oo[3]=cell.v; }
-						else { oo[2]='vtf'; oo[3]='n'; oo[4]=cell.v; oo[5]=encode(cell.f); }
-						break;
+					case 's': oo.push(encode(cell.v)); break;
 					case 'b':
 						oo[2] = 'vt'+(cell.f?'f':'c'); oo[3]='nl'; oo[4]=cell.v?"1":"0";
 						oo[5] = encode(cell.f||(cell.v?'TRUE':'FALSE'));
@@ -878,6 +874,19 @@ var ETH = /*#__PURE__*/(function() {
 						var t = datenum(parseDate(cell.v));
 						oo[2] = 'vtc'; oo[3] = 'nd'; oo[4] = ""+t;
 						oo[5] = cell.w || SSF_format(cell.z || table_fmt[14], t);
+						break;
+					case 'n':
+						if(isFinite(cell.v)) {
+							if(!cell.f) { oo[2]='v'; oo[3]=cell.v; }
+							else { oo[2]='vtf'; oo[3]='n'; oo[4]=cell.v; oo[5]=encode(cell.f); }
+						} else {
+							oo[2] = 'vt' + (cell.f ? 'f' : 'c');
+							oo[3] = "e" + BErr[isNaN(cell.v) ? 0x24 : 0x07];
+							oo[4] = "0";
+							oo[5] = cell.f || oo[3].slice(1);
+							oo[6] = "e";
+							oo[7] = oo[3].slice(1);
+						}
 						break;
 					case 'e': continue;
 				}
@@ -910,6 +919,7 @@ var PRN = /*#__PURE__*/(function() {
 		else if(data === 'FALSE') arr[R][C] = false;
 		else if(!isNaN(fuzzynum(data))) arr[R][C] = fuzzynum(data);
 		else if(!isNaN(fuzzydate(data).getDate())) arr[R][C] = parseDate(data);
+		else if(data.charCodeAt(0) == 35 /* # */ && RBErr[data] != null) arr[R][C] = ({ t: 'e', v: RBErr[data], w: data });
 		else arr[R][C] = data;
 	}
 
@@ -1027,6 +1037,8 @@ var PRN = /*#__PURE__*/(function() {
 				if(o.cellDates) { cell.t = 'd'; cell.v = v; }
 				else { cell.t = 'n'; cell.v = datenum(v); }
 				if(!o.cellNF) delete cell.z;
+			} else if(s.charCodeAt(0) == 35 /* # */ && RBErr[s] != null) {
+				cell.t = 'e'; cell.w = s; cell.v = RBErr[s];
 			} else {
 				cell.t = 's';
 				cell.v = s;

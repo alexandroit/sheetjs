@@ -32,6 +32,26 @@ function parsexmltag(tag/*:string*/, skip_root/*:?boolean*/, skip_LC/*:?boolean*
 	}
 	return z;
 }
+function parsexmltagraw(tag/*:string*/, skip_root/*:?boolean*/, skip_LC/*:?boolean*/)/*:any*/ {
+	var z = ({}/*:any*/);
+	var eq = 0, c = 0;
+	for(; eq !== tag.length; ++eq) if((c = tag.charCodeAt(eq)) === 32 || c === 10 || c === 13) break;
+	if(!skip_root) z[0] = tag.slice(0, eq);
+	if(eq === tag.length) return z;
+	var m = tag.match(attregexg), j=0, v="", i=0, q="", cc="", quot = 1;
+	if(m) for(i = 0; i != m.length; ++i) {
+		cc = m[i].slice(1);
+		for(c=0; c != cc.length; ++c) if(cc.charCodeAt(c) === 61) break;
+		q = cc.slice(0,c).trim();
+		while(cc.charCodeAt(c+1) == 32) ++c;
+		quot = ((eq=cc.charCodeAt(c+1)) == 34 || eq == 39) ? 1 : 0;
+		v = cc.slice(c+1+quot, cc.length-quot);
+		if(q.indexOf("_") > 0) q = q.slice(0, q.indexOf("_")); // from ods
+		z[q] = v;
+		if(!skip_LC) z[q.toLowerCase()] = v;
+	}
+	return z;
+}
 function strip_ns(x/*:string*/)/*:string*/ { return x.replace(nsregex2, "<$1"); }
 
 var encodings = {

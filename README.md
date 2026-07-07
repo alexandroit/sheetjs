@@ -14,14 +14,14 @@
 **[Issues](https://github.com/alexandroit/sheetjs/issues)** |
 **[Repository](https://github.com/alexandroit/sheetjs)**
 
-**Public release line:** `1.0.3`
+**Public release line:** `1.0.4`
 
 ---
 
 ## Why this package?
 
 `@stackline/xlsx` is an independent maintained fork of SheetJS Community
-Edition `0.20.2`. It keeps the familiar workbook API while adding regression
+Edition `0.20.3`. It keeps the familiar workbook API while adding regression
 coverage and hardening for known prototype pollution and ReDoS advisories.
 
 The primary goal is compatibility with existing spreadsheet workflows,
@@ -31,8 +31,8 @@ including Angular applications that currently depend on `xlsx`.
 
 | Item | Value |
 | :--- | :--- |
-| Package | `@stackline/xlsx@1.0.3` |
-| API target | `xlsx@0.20.2` |
+| Package | `@stackline/xlsx@1.0.4` |
+| API target | `xlsx@0.20.3` |
 | Runtime dependencies | none |
 | Supported Node.js | `>=20` |
 | Types | `types/index.d.ts` |
@@ -111,7 +111,7 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');
 
 ## Supported Formats
 
-The fork keeps the upstream SheetJS Community Edition `0.20.2` format surface.
+The fork keeps the upstream SheetJS Community Edition `0.20.3` format surface.
 
 | Format family | Read | Write | Notes |
 | :--- | :---: | :---: | :--- |

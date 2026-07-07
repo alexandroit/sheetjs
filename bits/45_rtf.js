@@ -49,6 +49,10 @@ function rtf_to_sheet_str(str, opts) {
               if (o.cellText !== false)
                 cell.w = cell.v;
               cell.v = fuzzynum(cell.v);
+            } else if (RBErr[cell.v] != null) {
+              cell.t = "e";
+              cell.w = cell.v;
+              cell.v = RBErr[cell.v];
             }
             if (dense)
               row[C] = cell;

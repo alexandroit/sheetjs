@@ -262,9 +262,22 @@ var write_content_ods/*:{(wb:any, opts:any):string}*/ = /* @__PURE__ */(function
 						ct['office:boolean-value'] = (cell.v ? 'true' : 'false');
 						break;
 					case 'n':
-						textp = (cell.w||String(cell.v||0));
-						ct['office:value-type'] = "float";
-						ct['office:value'] = (cell.v||0);
+						if(!isFinite(cell.v)) {
+							if(isNaN(cell.v)) {
+								textp = "#NUM!";
+								ct['table:formula'] = "of:=#NUM!";
+							} else {
+								textp = "#DIV/0!";
+								ct['table:formula'] = "of:=" + (cell.v < 0 ? "-" : "") + "1/0";
+							}
+							ct['office:string-value'] = "";
+							ct['office:value-type'] = "string";
+							ct['calcext:value-type'] = "error";
+						} else {
+							textp = (cell.w||String(cell.v||0));
+							ct['office:value-type'] = "float";
+							ct['office:value'] = (cell.v||0);
+						}
 						break;
 					case 's': case 'str':
 						textp = cell.v == null ? "" : cell.v;
