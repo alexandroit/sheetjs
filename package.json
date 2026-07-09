@@ -143,7 +143,8 @@
 		"tests-only": "make travis",
 		"build": "make",
 		"lint": "make fullint",
-		"dtslint": "tsc -p types/tsconfig.json"
+		"dtslint": "tsc -p types/tsconfig.json",
+		"types-compat": "bash misc/typescript-compat.sh"
 	},
 	"config": {
 		"blanket": {

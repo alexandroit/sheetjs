@@ -117,6 +117,8 @@ https://github.com/alexandroit/sheetjs/tree/github
   - Deno tests no longer depend on an unpinned remote base64 helper.
   - Required Node CI targets supported Node.js releases: `20.x`, `22.x` and
     `24.x`.
+  - TypeScript compatibility CI validates the published typings shape against
+    TypeScript `3.9.10`, `4.2.4`, `4.9.5`, `5.0.4` and `5.9.3`.
   - Node `0.x` and `io.js` workflows are manual only because scoped public npm
     packages and current dev tooling are not compatible with those runtimes.
 

@@ -1,0 +1,27 @@
+name: 'Tests: TypeScript compatibility'
+
+on: [pull_request, push]
+
+jobs:
+  typings:
+    name: 'typescript ${{ matrix.typescript-version }}'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        typescript-version:
+          - '3.9.10'
+          - '4.2.4'
+          - '4.9.5'
+          - '5.0.4'
+          - '5.9.3'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+      - run: npm ci
+      - run: npm run types-compat -- ${{ matrix.typescript-version }}
