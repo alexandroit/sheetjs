@@ -41,8 +41,8 @@ import * as XLSX from 'xlsx';
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
 - Working branch: `github`
 - Base: SheetJS Community Edition `v0.20.3`
-- Current package version: `1.0.5` (Verdaccio release candidate)
-- Verdaccio `latest`: `1.0.4`
+- Current package version: `1.0.5`
+- Verdaccio `latest`: `1.0.5`
 - Official npm `latest`: `1.0.4`
 - Package name: `@stackline/xlsx`
 - Current security scope:
@@ -69,10 +69,12 @@ import * as XLSX from 'xlsx';
   and public npm before the upstream `0.20.3` merge.
 - Published `@stackline/xlsx@1.0.4` to Verdaccio and public npm after
   merging SheetJS CE `v0.20.3` and passing local and GitHub validation.
+- Published `@stackline/xlsx@1.0.5` to Verdaccio only after compatibility,
+  package and GitHub validation. The official npm release remains `1.0.4`.
 - Replaced the internal Verdaccio `@stackline/xlsx@1.0.0` tarball with the
   public-ready `1.0.0` tarball after removing the old Verdaccio-only metadata.
-- Confirmed Verdaccio `latest` points to `1.0.4` before the `1.0.5`
-  maintenance release.
+- Confirmed Verdaccio `latest` points to `1.0.5` after the maintenance
+  release.
 - Staged alexandro.net docs at:
 
 ```bash
@@ -126,8 +128,8 @@ https://github.com/alexandroit/sheetjs/tree/github
 
 ## Current Round
 
-- Current focus: prepare `@stackline/xlsx@1.0.5` for Verdaccio while keeping
-  the official npm release at `1.0.4` until a separate publication request.
+- Current focus: `@stackline/xlsx@1.0.5` is complete on Verdaccio while the
+  official npm release remains at `1.0.4` until a separate publication request.
 - Maintenance review performed on August 9, 2026:
   - SheetJS CE `v0.20.3` remains the newest official upstream tag.
   - Untagged upstream `master` changes were reviewed without performing a
@@ -153,6 +155,28 @@ https://github.com/alexandroit/sheetjs/tree/github
     `dist/LICENSE` and `NOTICE`
   - local tarball CommonJS and ESM install smoke: passed
   - runtime dependencies remain empty
+- `1.0.5` release validation and publication:
+  - GitHub principal branch commit: `bc52d77`
+  - GitHub Actions passed:
+    - `Tests: node.js` on Node `20.x`, `22.x`, `24.x` and `26.x`
+    - `Tests: Deno` on Deno `1.46.3` and `2.9.5`, with and without codepage
+    - `Tests: Bun`
+    - `Tests: TypeScript compatibility`
+    - `Tests: pretest/posttest`
+  - The first Deno 2 no-codepage run exposed stale generated catch-variable
+    typing in `testnocp.ts`; the harness was corrected and the complete rerun
+    passed.
+  - Verdaccio publish: `@stackline/xlsx@1.0.5`
+  - Verdaccio direct scoped install smoke: passed
+  - Verdaccio `xlsx@npm:@stackline/xlsx@1.0.5` alias smoke: passed
+  - Verdaccio consumer audit: `0 vulnerabilities`
+  - Browser consumer app updated at
+    `/storage/data/github/tests/xlsx-verdaccio-live`
+  - Browser consumer smoke and Vite production build: passed
+  - Public docs synchronized to
+    `https://alexandro.net/docs/vanilla/xlsx/`, returning HTTP 200 with the
+    official npm version `1.0.4` and the new `NOTICE` attribution
+  - Official npm registry explicitly verified unchanged at `1.0.4`
 - Public docs under `docs/` intentionally continue to show `1.0.4`, because
   that is the current official npm version. Update them to `1.0.5` only after
   an explicitly authorized public npm release.
