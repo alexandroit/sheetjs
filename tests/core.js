@@ -1518,6 +1518,25 @@ describe('write features', function() {
 			var str = X.write(wb, {bookType:"html", type:"binary"});
 			assert.ok(str.indexOf("<b>abc</b>") > 0);
 		});
+		it('should sanitize unsafe links only when requested', function() {
+			[
+				"javascript:alert(1)", " JAVASCRIPT:alert(1)", "java\tscript:alert(1)",
+				"vbscript:msgbox(1)", "data:text/html,<script>alert(1)</script>",
+				"custom-protocol:payload"
+			].forEach(function(target) {
+				var sheet = X.utils.aoa_to_sheet([["Link"]]);
+				get_cell(sheet, "A1").l = {Target: target};
+				assert.ok(X.utils.sheet_to_html(sheet).indexOf('<a href=') > -1);
+				assert.equal(X.utils.sheet_to_html(sheet, {sanitizeLinks:true}).indexOf('<a href='), -1);
+			});
+		});
+		it('should preserve safe links when sanitization is requested', function() {
+			["https://example.com", "http://example.com", "mailto:test@example.com", "tel:+15551234567", "/relative/path", "../report.html"].forEach(function(target) {
+				var sheet = X.utils.aoa_to_sheet([["Link"]]);
+				get_cell(sheet, "A1").l = {Target: target};
+				assert.ok(X.utils.sheet_to_html(sheet, {sanitizeLinks:true}).indexOf('<a href=') > -1);
+			});
+		});
 	});
 	describe('sheet range limits', function() { [
 		["biff2", "IV16384"],

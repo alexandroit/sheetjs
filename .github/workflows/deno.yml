@@ -1,39 +1,40 @@
-name: 'Tests: deno 1.x'
+name: 'Tests: Deno'
 
 on: [pull_request, push]
 
 jobs:
-  # full test
-  full:
-    name: 'full (with codepage)'
+  test:
+    name: '${{ matrix.label }}'
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: 'Deno 1 with codepage'
+            deno-version: 'v1.46.3'
+            test-file: 'test.ts'
+          - label: 'Deno 1 without codepage'
+            deno-version: 'v1.46.3'
+            test-file: 'testnocp.ts'
+          - label: 'Deno 2 with codepage'
+            deno-version: 'v2.9.5'
+            test-file: 'test.ts'
+          - label: 'Deno 2 without codepage'
+            deno-version: 'v2.9.5'
+            test-file: 'testnocp.ts'
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: denoland/setup-deno@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
-          deno-version: v1.x
-      - uses: ljharb/actions/node/install@main
+          deno-version: ${{ matrix.deno-version }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '16.'
-      - run: sudo curl -Lo /usr/bin/rooster https://github.com/SheetJS/rooster/releases/download/v0.2.0/rooster-v0.2.0-linux-amd64
-      - run: sudo chmod a+x /usr/bin/rooster
+          node-version: '24.x'
+          cache: npm
+      - run: npm ci
+      - run: bash misc/install-rooster.sh
       - run: make init
       - run: 'echo "Using pinned test_files.zip fixtures; skipping optional live fixture refresh"'
-      - run: deno test --allow-env --allow-read --allow-write --config misc/test.deno.jsonc test.ts
-  # full test (no codepage)
-  fullnocp:
-    name: 'full (no codepage)'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: denoland/setup-deno@main
-        with:
-          deno-version: v1.x
-      - uses: ljharb/actions/node/install@main
-        with:
-          node-version: '16.'
-      - run: sudo curl -Lo /usr/bin/rooster https://github.com/SheetJS/rooster/releases/download/v0.2.0/rooster-v0.2.0-linux-amd64
-      - run: sudo chmod a+x /usr/bin/rooster
-      - run: make init
-      - run: 'echo "Using pinned test_files.zip fixtures; skipping optional live fixture refresh"'
-      - run: deno test --allow-env --allow-read --allow-write --config misc/test.deno.jsonc testnocp.ts
+      - run: deno test --frozen --allow-env --allow-read --allow-write --config misc/test.deno.jsonc ${{ matrix.test-file }}

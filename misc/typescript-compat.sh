@@ -28,6 +28,22 @@ npm install --silent --no-audit --no-fund "typescript@$TS_VERSION" "$TARBALL"
 rm -rf node_modules/xlsx
 cp -R node_modules/@stackline/xlsx node_modules/xlsx
 
+TS_MAJOR="${TS_VERSION%%.*}"
+if [ "$TS_MAJOR" -ge 6 ]; then
+cat > tsconfig.json <<'JSON'
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "strict": true,
+    "skipLibCheck": false,
+    "noEmit": true
+  },
+  "files": ["index.ts"]
+}
+JSON
+else
 cat > tsconfig.json <<'JSON'
 {
   "compilerOptions": {
@@ -41,6 +57,7 @@ cat > tsconfig.json <<'JSON'
   "files": ["index.ts"]
 }
 JSON
+fi
 
 cat > index.ts <<'TS'
 import * as StacklineXLSX from '@stackline/xlsx';
@@ -54,8 +71,10 @@ const rows = XLSX.utils.sheet_to_json(wb.Sheets.Sheet1, { header: 1 }) as any[][
 const value: number = rows[1][0];
 const bookType: StacklineXLSX.BookType = 'xlsx';
 const out = StacklineXLSX.write(wb, { bookType, type: 'array' });
+const safeHtml = StacklineXLSX.utils.sheet_to_html(ws, { sanitizeLinks: true });
+const safeHtmlBook = StacklineXLSX.write(wb, { bookType: 'html', type: 'string', sanitizeLinks: true });
 
-if(value !== 42 || !out) throw new Error('TypeScript compatibility smoke failed');
+if(value !== 42 || !out || !safeHtml || !safeHtmlBook) throw new Error('TypeScript compatibility smoke failed');
 TS
 
 ./node_modules/.bin/tsc -p tsconfig.json

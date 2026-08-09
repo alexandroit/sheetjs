@@ -317,6 +317,9 @@ export interface WritingOptions extends CommonOptions {
 
     /** Record Separator ("row separator") for CSV / Text output */
     RS?: string;
+
+    /** Restrict HTML export hyperlinks to relative URLs and common safe protocols */
+    sanitizeLinks?: boolean;
 }
 
 /** Workbook Object */
@@ -803,6 +806,9 @@ export interface Sheet2HTMLOpts {
 
     /** Footer HTML */
     footer?: string;
+
+    /** Restrict hyperlinks to relative URLs and common safe protocols */
+    sanitizeLinks?: boolean;
 }
 
 export interface Sheet2JSONOpts extends DateNFOption {

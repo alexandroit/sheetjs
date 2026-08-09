@@ -1,6 +1,6 @@
 {
 	"name": "@stackline/xlsx",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"author": "sheetjs",
 	"description": "SheetJS-compatible spreadsheet parser and writer with Stackline security hardening",
 	"keywords": [
@@ -170,6 +170,7 @@
 		"CHANGELOG.md",
 		"CONTRIBUTING.md",
 		"LICENSE",
+		"NOTICE",
 		"README.md",
 		"SECURITY.md",
 		"bower.json",

@@ -10,7 +10,7 @@ jobs:
       stable: ${{ steps.set-matrix.outputs.requireds }}
 #      unstable: ${{ steps.set-matrix.outputs.optionals }}
     steps:
-      - uses: ljharb/actions/node/matrix@main
+      - uses: ljharb/actions/node/matrix@a50960f7a82dfdf815255483595fa3cef562c9de
         id: set-matrix
         with:
           versionsAsRoot: true
@@ -40,15 +40,14 @@ jobs:
               FMTS: misc
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: ljharb/actions/node/install@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ljharb/actions/node/install@a50960f7a82dfdf815255483595fa3cef562c9de
         name: 'nvm install ${{ matrix.node-version }} && npm install'
         with:
           node-version: ${{ matrix.node-version }}
           cache-node-modules-key: node_modules-${{ github.workflow }}-${{ github.action }}-${{ github.run_id }}
           skip-ls-check: true
-      - run: sudo curl -Lo /usr/bin/rooster https://github.com/SheetJS/rooster/releases/download/v0.2.0/rooster-v0.2.0-linux-amd64
-      - run: sudo chmod a+x /usr/bin/rooster
+      - run: bash misc/install-rooster.sh
       - run: make init
       - run: 'echo "Using pinned test_files.zip fixtures; skipping optional live fixture refresh"'
       - run: npm run tests-only

@@ -1,0 +1,16 @@
+@stackline/xlsx
+Copyright 2026 Stackline contributors
+
+This product is an independent maintained fork of SheetJS Community Edition.
+The original SheetJS work and the bundled codepage / cpexcel components are:
+
+  Copyright (C) 2012-present SheetJS LLC
+  https://sheetjs.com/
+
+The original work and the Stackline downstream modifications are distributed
+under the Apache License, Version 2.0. The full license text is included in the
+LICENSE file. Stackline maintains the downstream security hardening, tests,
+documentation, build configuration and package releases.
+
+SheetJS is a trademark of SheetJS LLC. This notice describes the origin of the
+software and does not imply endorsement by or affiliation with SheetJS LLC.

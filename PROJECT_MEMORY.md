@@ -41,7 +41,7 @@ import * as XLSX from 'xlsx';
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
 - Working branch: `github`
 - Base: SheetJS Community Edition `v0.20.3`
-- Current package version: `1.0.4`
+- Current package version: `1.0.5` (Verdaccio release candidate)
 - Verdaccio `latest`: `1.0.4`
 - Official npm `latest`: `1.0.4`
 - Package name: `@stackline/xlsx`
@@ -71,7 +71,8 @@ import * as XLSX from 'xlsx';
   merging SheetJS CE `v0.20.3` and passing local and GitHub validation.
 - Replaced the internal Verdaccio `@stackline/xlsx@1.0.0` tarball with the
   public-ready `1.0.0` tarball after removing the old Verdaccio-only metadata.
-- Confirmed Verdaccio `latest` points to `1.0.2`.
+- Confirmed Verdaccio `latest` points to `1.0.4` before the `1.0.5`
+  maintenance release.
 - Staged alexandro.net docs at:
 
 ```bash
@@ -115,16 +116,46 @@ https://github.com/alexandroit/sheetjs/tree/github
     tries to refresh optional external fixture repos during push checks.
   - Bun uses the maintained `make test-bun_misc` target.
   - Deno tests no longer depend on an unpinned remote base64 helper.
-  - Required Node CI targets supported Node.js releases: `20.x`, `22.x` and
-    `24.x`.
+  - Required Node CI targets supported Node.js releases: `20.x`, `22.x`,
+    `24.x` and `26.x`.
   - TypeScript compatibility CI validates the published typings shape against
-    TypeScript `3.9.10`, `4.2.4`, `4.9.5`, `5.0.4` and `5.9.3`.
+    TypeScript `3.9.10`, `4.2.4`, `4.9.5`, `5.0.4`, `5.9.3`, `6.0.3` and
+    `7.0.2`.
   - Node `0.x` and `io.js` workflows are manual only because scoped public npm
     packages and current dev tooling are not compatible with those runtimes.
 
 ## Current Round
 
-- Current focus: `@stackline/xlsx@1.0.4` public npm release is complete.
+- Current focus: prepare `@stackline/xlsx@1.0.5` for Verdaccio while keeping
+  the official npm release at `1.0.4` until a separate publication request.
+- Maintenance review performed on August 9, 2026:
+  - SheetJS CE `v0.20.3` remains the newest official upstream tag.
+  - Untagged upstream `master` changes were reviewed without performing a
+    broad merge.
+  - Selected the hidden-row stream fix because it is narrowly scoped and
+    backwards-compatible.
+  - Added an opt-in HTML hyperlink sanitizer with bounded linear parsing;
+    default HTML output remains unchanged.
+  - Deferred broad untagged upstream synchronization to a future minor release
+    with dedicated compatibility review.
+- `1.0.5` release-candidate validation completed locally:
+  - targeted security and compatibility regressions: `15 passing`
+  - `npm run dtslint`: passed
+  - TypeScript compatibility: `3.9.10`, `4.2.4`, `4.9.5`, `5.0.4`, `5.9.3`,
+    `6.0.3` and `7.0.2` passed
+  - Bun `1.3.14` targeted suite: passed
+  - Deno `1.46.3` and `2.9.5` targeted suites: passed
+  - `npm test`: `74691 passing`, `2 pending`
+  - `npm run build`: passed
+  - `make dist`: passed
+  - `npm audit`: `0 vulnerabilities`
+  - `npm pack --dry-run --json`: 28 expected files, including `LICENSE`,
+    `dist/LICENSE` and `NOTICE`
+  - local tarball CommonJS and ESM install smoke: passed
+  - runtime dependencies remain empty
+- Public docs under `docs/` intentionally continue to show `1.0.4`, because
+  that is the current official npm version. Update them to `1.0.5` only after
+  an explicitly authorized public npm release.
 - `1.0.4` Verdaccio validation completed locally:
   - `npm run dtslint`: passed
   - `npm run build`: passed
@@ -482,19 +513,19 @@ prototype pollution and ReDoS advisories.
 
 ### 9. License compliance documentation TODO
 
-- [ ] Add a root `NOTICE` or `THIRD_PARTY_NOTICES.md` file for stronger public
+- [x] Add a root `NOTICE` or `THIRD_PARTY_NOTICES.md` file for stronger public
   package auditability.
-- [ ] Explicitly state that the fork is based on SheetJS Community Edition and
+- [x] Explicitly state that the fork is based on SheetJS Community Edition and
   that original SheetJS copyrights belong to SheetJS LLC.
-- [ ] Document that Stackline maintains the security hardening and downstream
+- [x] Document that Stackline maintains the security hardening and downstream
   release changes.
-- [ ] Mention included Apache-2.0 SheetJS components such as `codepage` /
+- [x] Mention included Apache-2.0 SheetJS components such as `codepage` /
   `cpexcel` where applicable.
-- [ ] Include the notice file in `package.json#files` so it ships in the npm
+- [x] Include the notice file in `package.json#files` so it ships in the npm
   tarball.
-- [ ] Link the notice file from the README license section and public docs
+- [x] Link the notice file from the README license section and public docs
   footer.
-- [ ] Re-run `npm pack --dry-run` and confirm `LICENSE`, `dist/LICENSE` and the
+- [x] Re-run `npm pack --dry-run` and confirm `LICENSE`, `dist/LICENSE` and the
   new notice file are included.
 
 ## Commands Worth Remembering

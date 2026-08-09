@@ -103,7 +103,10 @@ function write_json_stream(sheet/*:Worksheet*/, opts/*:?Sheet2CSVOpts*/) {
 	R = r.s.r + offset;
 	stream._read = function() {
 		while(R <= r.e.r) {
-			if ((rowinfo[R-1]||{}).hidden) continue;
+			if ((rowinfo[R]||{}).hidden) {
+				++R;
+				continue;
+			}
 			var row = make_json_row(sheet, r, R, cols, header, hdr, o);
 			++R;
 			if((row.isempty === false) || (header === 1 ? o.blankrows !== false : !!o.blankrows)) {

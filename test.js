@@ -1529,6 +1529,33 @@ describe('write features', function() {
 			var str = X.write(wb, {bookType:"html", type:"binary"});
 			assert.ok(str.indexOf("<b>abc</b>") > 0);
 		});
+		it('should sanitize unsafe links only when requested', function() {
+			[
+				"javascript:alert(1)", " JAVASCRIPT:alert(1)", "java\tscript:alert(1)",
+				"vbscript:msgbox(1)", "data:text/html,<script>alert(1)</script>",
+				"custom-protocol:payload"
+			].forEach(function(target) {
+				var sheet = X.utils.aoa_to_sheet([["Link"]]);
+				get_cell(sheet, "A1").l = {Target: target};
+				assert.ok(X.utils.sheet_to_html(sheet).indexOf('<a href=') > -1);
+				assert.equal(X.utils.sheet_to_html(sheet, {sanitizeLinks:true}).indexOf('<a href='), -1);
+			});
+		});
+		it('should preserve safe links when sanitization is requested', function() {
+			["https://example.com", "http://example.com", "mailto:test@example.com", "tel:+15551234567", "/relative/path", "../report.html"].forEach(function(target) {
+				var sheet = X.utils.aoa_to_sheet([["Link"]]);
+				get_cell(sheet, "A1").l = {Target: target};
+				assert.ok(X.utils.sheet_to_html(sheet, {sanitizeLinks:true}).indexOf('<a href=') > -1);
+			});
+		});
+		it('should sanitize links through the workbook writer', function() {
+			var sheet = X.utils.aoa_to_sheet([["Link"]]);
+			get_cell(sheet, "A1").l = {Target: "javascript:alert(1)"};
+			var wb = X.utils.book_new();
+			X.utils.book_append_sheet(wb, sheet, "Sheet1");
+			assert.ok(X.write(wb, {bookType:"html", type:"string"}).indexOf('<a href=') > -1);
+			assert.equal(X.write(wb, {bookType:"html", type:"string", sanitizeLinks:true}).indexOf('<a href='), -1);
+		});
 	});
 	describe('sheet range limits', function() { [
 		["biff2", "IV16384"],
@@ -1999,6 +2026,24 @@ describe('security regressions', function() {
 			X.utils.book_append_sheet(wb, X.utils.aoa_to_sheet([["safe"]]), n);
 		}); });
 		assert.equal(({}).polluted, undefined);
+	});
+
+	it('should terminate JSON streams after hidden rows', function(done) {
+		var script = [
+			"var X = require('./');",
+			"var ws = X.utils.aoa_to_sheet([['Header'], ['hidden'], ['visible']]);",
+			"ws['!rows'] = [null, {hidden:true}, null];",
+			"var rows = [];",
+			"var stream = X.stream.to_json(ws, {skipHidden:true});",
+			"stream.on('data', function(row) { rows.push(row); });",
+			"stream.on('error', function(err) { throw err; });",
+			"stream.on('end', function() { process.stdout.write(JSON.stringify(rows)); });"
+		].join("");
+		require("child_process").execFile(process.execPath, ["-e", script], {cwd:process.cwd(), timeout:3000}, function(err, stdout) {
+			if(err) return done(err);
+			assert.equal(stdout, '[{"Header":"visible"}]');
+			done();
+		});
 	});
 
 	it('should not pollute prototypes from sheet_to_json headers', function() {

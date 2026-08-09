@@ -61,6 +61,30 @@ function html_to_sheet(str/*:string*/, _opts)/*:Workbook*/ {
 	if(merges.length) ws["!merges"] = merges;
 	return ws;
 }
+function is_safe_html_link(target/*:string*/)/*:boolean*/ {
+	var scheme = "", too_long = false;
+	for(var i = 0; i < target.length; ++i) {
+		var cc = target.charCodeAt(i);
+		/* Browsers ignore ASCII whitespace and control characters in URL schemes. */
+		if(cc <= 0x20 || (cc >= 0x7F && cc <= 0x9F)) continue;
+		if(cc == 0x2F || cc == 0x3F || cc == 0x23 || cc == 0x5C) return true;
+		if(cc == 0x3A) {
+			if(!scheme.length || too_long) return false;
+			switch(scheme.toLowerCase()) {
+				case "http": case "https": case "mailto": case "tel":
+				case "ftp": case "ftps": return true;
+			}
+			return false;
+		}
+		if(!scheme.length) {
+			if(!((cc >= 0x41 && cc <= 0x5A) || (cc >= 0x61 && cc <= 0x7A))) return true;
+		} else if(!((cc >= 0x41 && cc <= 0x5A) || (cc >= 0x61 && cc <= 0x7A) || (cc >= 0x30 && cc <= 0x39) || cc == 0x2B || cc == 0x2D || cc == 0x2E)) return true;
+		if(scheme.length < 32) scheme += target.charAt(i);
+		else too_long = true;
+	}
+	return true;
+}
+
 function make_html_row(ws/*:Worksheet*/, r/*:Range*/, R/*:number*/, o/*:Sheet2HTMLOpts*/)/*:string*/ {
 	var M/*:Array<Range>*/ = (ws['!merges'] ||[]);
 	var oo/*:Array<string>*/ = [];
@@ -92,7 +116,7 @@ function make_html_row(ws/*:Worksheet*/, r/*:Range*/, R/*:number*/, o/*:Sheet2HT
 			// note: data-v is unaffected by the timezone interpretation
 			if(cell.v != null) sp["data-v"] = escapehtml(cell.v instanceof Date ? cell.v.toISOString() : cell.v);
 			if(cell.z != null) sp["data-z"] = cell.z;
-			if(cell.l && (cell.l.Target || "#").charAt(0) != "#") w = '<a href="' + escapehtml(cell.l.Target) +'">' + w + '</a>';
+			if(cell.l && (cell.l.Target || "#").charAt(0) != "#" && (!o.sanitizeLinks || is_safe_html_link(String(cell.l.Target || "")))) w = '<a href="' + escapehtml(cell.l.Target) +'">' + w + '</a>';
 		}
 		sp.id = (o.id || "sjs") + "-" + coord;
 		oo.push(writextag('td', w, sp));

@@ -11,7 +11,7 @@ declare var cptable: any;
 */
 import * as assert_ from 'https://deno.land/std@0.224.0/testing/asserts.ts';
 const assert: any = {...assert_};
-assert.throws = function(f: () => void) { assert.assertThrows(function() { try { f(); } catch(e) { throw e instanceof Error ? e : new Error(e); }})};
+assert.throws = function(f: () => void) { assert.assertThrows(function() { try { f(); } catch(e) { throw e instanceof Error ? e : new Error(String(e)); }})};
 assert.doesNotThrow = function(f: ()=>void) { f(); };
 assert.equal = assert.assertEquals;
 assert.notEqual = assert.assertNotEquals;
@@ -1483,6 +1483,25 @@ describe('write features', function() {
 			var wb = {SheetNames:["Sheet1"], Sheets:{Sheet1:sheet}};
 			var str = X.write(wb, {bookType:"html", type:"binary"});
 			assert.ok(str.indexOf("<b>abc</b>") > 0);
+		});
+		it('should sanitize unsafe links only when requested', function() {
+			[
+				"javascript:alert(1)", " JAVASCRIPT:alert(1)", "java\tscript:alert(1)",
+				"vbscript:msgbox(1)", "data:text/html,<script>alert(1)</script>",
+				"custom-protocol:payload"
+			].forEach(function(target) {
+				var sheet = X.utils.aoa_to_sheet([["Link"]]);
+				get_cell(sheet, "A1").l = {Target: target};
+				assert.ok(X.utils.sheet_to_html(sheet).indexOf('<a href=') > -1);
+				assert.equal(X.utils.sheet_to_html(sheet, {sanitizeLinks:true}).indexOf('<a href='), -1);
+			});
+		});
+		it('should preserve safe links when sanitization is requested', function() {
+			["https://example.com", "http://example.com", "mailto:test@example.com", "tel:+15551234567", "/relative/path", "../report.html"].forEach(function(target) {
+				var sheet = X.utils.aoa_to_sheet([["Link"]]);
+				get_cell(sheet, "A1").l = {Target: target};
+				assert.ok(X.utils.sheet_to_html(sheet, {sanitizeLinks:true}).indexOf('<a href=') > -1);
+			});
 		});
 	});
 	describe('sheet range limits', function() { var b = ([
@@ -3037,14 +3056,16 @@ describe('encryption', function() {
 					X.read(fs.readFileSync(dir + x), {type:TYPE,password:'Password',WTF:opts.WTF});
 					throw new Error("incorrect password was accepted");
 				} catch(e) {
-					if(e.message != "Password is incorrect") throw e;
+					var err: any = e;
+					if(err.message != "Password is incorrect") throw err;
 				}
 			});
 			it('should recognize correct password', function() {
 				try {
 					X.read(fs.readFileSync(dir + x), {type:TYPE,password:'password',WTF:opts.WTF});
 				} catch(e) {
-					if(e.message == "Password is incorrect") throw e;
+					var err: any = e;
+					if(err.message == "Password is incorrect") throw err;
 				}
 			});
 			if(false) it('should decrypt file', function() {
@@ -3059,8 +3080,8 @@ describe('multiformat tests', function() {
 var mfopts = opts;
 var mft = fs.readFileSync('multiformat.lst','utf-8').replace(/\r/g,"").split("\n").map(function(x) { return x.trim(); });
 var csv = true, formulae = false;
-for(var mfti = 0; mfti < mft.length; ++mfti) { var x = mft[mfti];
-	if(x.charAt(0)!="#") (function(x: string, mftcsv: boolean, mftformulae: boolean) { describe('MFT ' + x, function() {
+for(var mfti = 0; mfti < mft.length; ++mfti) { let x = mft[mfti], mftcsv = csv, mftformulae = formulae;
+	if(x.charAt(0)!="#") { describe('MFT ' + x, function() {
 		var f: Array<X.WorkBook> = [], r = x.split(/\s+/);
 		if(r.length < 3) return;
 		if(!fs.existsSync(dir + r[0] + r[1])) return;
@@ -3094,7 +3115,7 @@ for(var mfti = 0; mfti < mft.length; ++mfti) { var x = mft[mfti];
 				cmparr(f.map(function(x) { return X.utils.sheet_to_formulae(x.Sheets[name]).sort(); }));
 			});
 		});
-	}); })(x, csv, formulae);
+	}); }
 	else x.split(/\s+/).forEach(function(w: string) { switch(w) {
 		case "no-csv": csv = false; break;
 		case "yes-csv": csv = true; break;

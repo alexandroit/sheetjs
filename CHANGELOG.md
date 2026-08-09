@@ -4,6 +4,20 @@ This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.
 
+## v1.0.5
+
+* Fixed `XLSX.stream.to_json` progression when `skipHidden` encounters hidden
+  rows, preventing an infinite loop and preserving the expected visible rows.
+* Added the opt-in `sanitizeLinks` HTML export option. It uses a bounded,
+  linear parser and permits relative URLs plus common safe protocols while
+  leaving default hyperlink behavior unchanged for compatibility.
+* Extended type validation through TypeScript 7 while retaining TypeScript 3.9
+  coverage and the existing public declaration shape.
+* Added Node.js 26 checks without removing Node.js 20 compatibility coverage.
+* Refreshed development-only dependency resolutions and CI supply-chain pins.
+* Added an Apache-2.0 `NOTICE` file covering SheetJS attribution and Stackline
+  downstream maintenance.
+
 ## v1.0.4
 
 * Incorporated SheetJS Community Edition `v0.20.3` functional updates:

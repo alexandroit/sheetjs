@@ -7,13 +7,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: ljharb/actions/node/install@main
-        name: 'nvm install lts/* && npm install'
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 'lts/*'
-      - run: sudo curl -Lo /usr/bin/rooster https://github.com/SheetJS/rooster/releases/download/v0.2.0/rooster-v0.2.0-linux-amd64
-      - run: sudo chmod a+x /usr/bin/rooster
+          node-version: '24.x'
+          cache: npm
+      - run: npm ci
+      - run: bash misc/install-rooster.sh
       - run: make init
       - run: 'echo "Using pinned test_files.zip fixtures; skipping optional live fixture refresh"'
       - run: npm run pretest

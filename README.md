@@ -14,7 +14,7 @@
 **[Issues](https://github.com/alexandroit/sheetjs/issues)** |
 **[Repository](https://github.com/alexandroit/sheetjs)**
 
-**Public release line:** `1.0.4`
+**Current package version:** `1.0.5`
 
 ---
 
@@ -31,7 +31,7 @@ including Angular applications that currently depend on `xlsx`.
 
 | Item | Value |
 | :--- | :--- |
-| Package | `@stackline/xlsx@1.0.4` |
+| Package | `@stackline/xlsx@1.0.5` |
 | API target | `xlsx@0.20.3` |
 | Runtime dependencies | none |
 | Supported Node.js | `>=20` |
@@ -143,6 +143,16 @@ Regression tests cover:
 - dangerous custom property names
 - JSON headers that try to pollute `Object.prototype`
 - malformed HTML input that should not stall regex parsing
+- hidden-row JSON streams that must always terminate
+
+HTML generated from untrusted workbooks can restrict hyperlinks to relative
+URLs and common safe protocols without changing the default behavior:
+
+```ts
+const html = XLSX.utils.sheet_to_html(worksheet, {
+  sanitizeLinks: true
+});
+```
 
 ## API Surface
 
@@ -216,4 +226,5 @@ It validates direct scoped imports, `xlsx` alias migration and ESM usage.
 [Apache-2.0](https://github.com/alexandroit/sheetjs/blob/github/LICENSE).
 This project is a maintained fork of SheetJS Community Edition. The original
 SheetJS copyright and license notices are preserved in the source tree and
-distribution files.
+distribution files. See [NOTICE](https://github.com/alexandroit/sheetjs/blob/github/NOTICE)
+for upstream attribution and downstream maintenance details.
