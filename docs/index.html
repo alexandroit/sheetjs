@@ -6,7 +6,7 @@
     <title>@stackline/xlsx Documentation</title>
     <meta
       name="description"
-      content="Public documentation for @stackline/xlsx 1.0.4, a maintained SheetJS-compatible spreadsheet parser and writer with security hardening."
+      content="Public documentation for @stackline/xlsx 1.0.5, a maintained SheetJS-compatible spreadsheet parser and writer with security hardening."
     />
     <meta
       name="keywords"
@@ -70,7 +70,7 @@
       <section class="summary">
         <div>
           <strong>Version</strong>
-          <span>1.0.4</span>
+          <span>1.0.5</span>
         </div>
         <div>
           <strong>API target</strong>
@@ -156,6 +156,13 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
             </p>
           </article>
         </div>
+        <p>
+          HTML exports can opt into hyperlink sanitization while existing
+          output remains unchanged by default.
+        </p>
+        <pre><code>const html = XLSX.utils.sheet_to_html(worksheet, {
+  sanitizeLinks: true
+});</code></pre>
       </section>
 
       <section class="section">
@@ -189,7 +196,7 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
           <h2>Public release checklist.</h2>
         </div>
         <ul class="checklist">
-          <li>Published as <code>@stackline/xlsx@1.0.4</code> on npm.</li>
+          <li>Published as <code>@stackline/xlsx@1.0.5</code> on npm.</li>
           <li>Run <code>npm ci</code>.</li>
           <li>Run <code>npm test</code>.</li>
           <li>Run <code>npm run build</code>.</li>
@@ -201,29 +208,30 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
 
       <section class="section">
         <div class="section-heading">
-          <p class="eyebrow">1.0.4 compatibility release</p>
-          <h2>SheetJS CE 0.20.3 updates with Stackline hardening preserved.</h2>
+          <p class="eyebrow">1.0.5 compatibility maintenance</p>
+          <h2>Reliable streams and safer HTML export without API breakage.</h2>
         </div>
         <div class="feature-grid">
           <article>
-            <h3>Updated upstream base</h3>
+            <h3>Reliable streams</h3>
             <p>
-              The package incorporates the SheetJS CE 0.20.3 parser and writer
-              updates while retaining the familiar workbook API.
+              Hidden rows now advance correctly in
+              <code>XLSX.stream.to_json</code>, preventing stalled streams while
+              preserving visible-row output.
             </p>
           </article>
           <article>
-            <h3>Security regression coverage</h3>
+            <h3>Opt-in link sanitization</h3>
             <p>
-              Prototype pollution and ReDoS hardening remain covered across
-              workbook formats and conversion helpers.
+              Set <code>sanitizeLinks: true</code> for bounded HTML hyperlink
+              validation. The default remains compatible with existing output.
             </p>
           </article>
           <article>
-            <h3>Consumer compatibility</h3>
+            <h3>Broad compatibility</h3>
             <p>
-              Direct scoped imports and the <code>xlsx</code> npm alias migration
-              path are validated before release.
+              CI covers Node.js 20 through 26 and TypeScript 3.9 through 7,
+              including direct scoped imports and npm alias migration.
             </p>
           </article>
         </div>

@@ -43,7 +43,7 @@ import * as XLSX from 'xlsx';
 - Base: SheetJS Community Edition `v0.20.3`
 - Current package version: `1.0.5`
 - Verdaccio `latest`: `1.0.5`
-- Official npm `latest`: `1.0.4`
+- Official npm `latest`: `1.0.5`
 - Package name: `@stackline/xlsx`
 - Current security scope:
   - GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533
@@ -69,8 +69,8 @@ import * as XLSX from 'xlsx';
   and public npm before the upstream `0.20.3` merge.
 - Published `@stackline/xlsx@1.0.4` to Verdaccio and public npm after
   merging SheetJS CE `v0.20.3` and passing local and GitHub validation.
-- Published `@stackline/xlsx@1.0.5` to Verdaccio only after compatibility,
-  package and GitHub validation. The official npm release remains `1.0.4`.
+- Published `@stackline/xlsx@1.0.5` to Verdaccio and public npm after
+  compatibility, package and GitHub validation.
 - Replaced the internal Verdaccio `@stackline/xlsx@1.0.0` tarball with the
   public-ready `1.0.0` tarball after removing the old Verdaccio-only metadata.
 - Confirmed Verdaccio `latest` points to `1.0.5` after the maintenance
@@ -128,8 +128,8 @@ https://github.com/alexandroit/sheetjs/tree/github
 
 ## Current Round
 
-- Current focus: `@stackline/xlsx@1.0.5` is complete on Verdaccio while the
-  official npm release remains at `1.0.4` until a separate publication request.
+- Current focus: `@stackline/xlsx@1.0.5` is the validated `latest` release on
+  Verdaccio and the official npm registry.
 - Maintenance review performed on August 9, 2026:
   - SheetJS CE `v0.20.3` remains the newest official upstream tag.
   - Untagged upstream `master` changes were reviewed without performing a
@@ -173,13 +173,17 @@ https://github.com/alexandroit/sheetjs/tree/github
   - Browser consumer app updated at
     `/storage/data/github/tests/xlsx-verdaccio-live`
   - Browser consumer smoke and Vite production build: passed
+  - Official npm publish: `@stackline/xlsx@1.0.5`
+  - Official npm `latest`: `1.0.5`
+  - Official npm direct scoped, npm alias, CommonJS and ESM smoke tests: passed
+  - Official npm consumer audit: `0 vulnerabilities`
+  - Verdaccio and official npm tarballs have the same SHA-1:
+    `f427d376220f62625e9f09c3dc6d6830c3eb7a4d`
   - Public docs synchronized to
     `https://alexandro.net/docs/vanilla/xlsx/`, returning HTTP 200 with the
-    official npm version `1.0.4` and the new `NOTICE` attribution
-  - Official npm registry explicitly verified unchanged at `1.0.4`
-- Public docs under `docs/` intentionally continue to show `1.0.4`, because
-  that is the current official npm version. Update them to `1.0.5` only after
-  an explicitly authorized public npm release.
+    official npm version `1.0.5`, release notes and `NOTICE` attribution
+  - Public `llms.txt` and `llms-full.txt` synchronized for version `1.0.5`
+  - GitHub release tag: `v1.0.5`
 - `1.0.4` Verdaccio validation completed locally:
   - `npm run dtslint`: passed
   - `npm run build`: passed
@@ -227,7 +231,7 @@ npm install xlsx@npm:@stackline/xlsx
   - preserved JSON header indexes
   - stronger real-workbook security regressions
   - Verdaccio consumer smoke-test environment
-- Latest validation results:
+- Historical release validation results:
   - `npm run build`: passed
   - `make dist`: passed
   - `make mdlint`: passed
@@ -277,10 +281,10 @@ npm install xlsx@npm:@stackline/xlsx
 
 ## Public Release Decision
 
-- The official npm first release should be `@stackline/xlsx@1.0.0`.
-- The package should not publish the deprecated `xlsx` CLI command.
-- `publishConfig` should not point to Verdaccio in the public-ready package.
-- `homepage` should point to the public docs:
+- The official npm first release was `@stackline/xlsx@1.0.0`.
+- The package does not publish the deprecated `xlsx` CLI command.
+- `publishConfig` does not point to Verdaccio in the public package.
+- `homepage` points to the public docs:
 
 ```text
 https://alexandro.net/docs/vanilla/xlsx/
@@ -429,9 +433,9 @@ Long-term architecture:
 - Phase 4: consider a smaller original library only if product usage proves
   the full `xlsx` surface is unnecessary.
 
-## Public npm Readiness
+## Public npm Policy
 
-Before npm public release:
+For public npm releases:
 
 - Replace internal/Verdaccio language with public package language.
 - Clearly state this is an independent maintained fork based on SheetJS CE.

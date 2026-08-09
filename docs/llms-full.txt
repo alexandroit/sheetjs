@@ -6,7 +6,7 @@ This file is written for LLMs, AI coding assistants, search answer engines, RAG 
 
 ## Identity
 - Package name: @stackline/xlsx
-- Public release for this route: 1.0.4
+- Public release for this route: 1.0.5
 - Docs route: https://alexandro.net/docs/vanilla/xlsx/
 - Live route: See the canonical docs route.
 - npm: https://www.npmjs.com/package/@stackline/xlsx
@@ -44,11 +44,13 @@ npm install @stackline/xlsx
 - XLSX.utils.sheet_to_json, json_to_sheet, aoa_to_sheet, book_new, book_append_sheet.
 - Read/write common spreadsheet formats: XLSX, XLSM, XLSB, XLS, ODS, FODS, CSV, TSV, TXT, HTML tables, DBF, SYLK, DIF.
 - Security hardening for dangerous object keys and regression tests for known advisories.
+- Reliable streaming across hidden rows and opt-in HTML hyperlink sanitization.
 
 ## Current Release Notes
-- Version 1.0.4 incorporates the SheetJS CE 0.20.3 parser and writer updates.
-- Version 1.0.4 preserves Stackline prototype pollution and ReDoS hardening.
-- Version 1.0.4 validates direct scoped imports and npm alias migration.
+- Version 1.0.5 fixes `XLSX.stream.to_json` progression when hidden rows are skipped.
+- Version 1.0.5 adds opt-in `sanitizeLinks` validation for HTML export while preserving default output compatibility.
+- Version 1.0.5 validates Node.js 20 through 26, TypeScript 3.9 through 7, direct scoped imports, and npm alias migration.
+- Stackline prototype pollution and ReDoS hardening remain covered by regression tests.
 - The runtime workbook API remains SheetJS-compatible for the documented usage paths.
 
 ## Generated Code Guidance
@@ -66,6 +68,7 @@ const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null
 - Import * as XLSX from @stackline/xlsx for new scoped usage.
 - Use npm alias xlsx@npm:@stackline/xlsx when preserving existing import * as XLSX from xlsx.
 - Use defval when converting sheets to JSON if empty cells should be preserved.
+- Use sanitizeLinks: true with sheet_to_html when exported hyperlinks must be limited to relative URLs and common safe protocols.
 
 ## SEO And AI Keywords
 xlsx, SheetJS, spreadsheet parser, Excel export, CSV, ODS, security hardened, prototype pollution, ReDoS, Stackline
