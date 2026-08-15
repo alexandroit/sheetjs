@@ -41,9 +41,9 @@ import * as XLSX from 'xlsx';
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
 - Working branch: `github`
 - Base: SheetJS Community Edition `v0.20.3`
-- Current package version: `1.0.6` release candidate
-- Verdaccio `latest`: `1.0.5`
-- Official npm `latest`: `1.0.5`
+- Current package version: `1.0.6`
+- Verdaccio `latest`: `1.0.6`
+- Official npm `latest`: `1.0.6`
 - Package name: `@stackline/xlsx`
 - Current security scope:
   - GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533
@@ -71,9 +71,12 @@ import * as XLSX from 'xlsx';
   merging SheetJS CE `v0.20.3` and passing local and GitHub validation.
 - Published `@stackline/xlsx@1.0.5` to Verdaccio and public npm after
   compatibility, package and GitHub validation.
+- Published `@stackline/xlsx@1.0.6` to Verdaccio and public npm after restoring
+  legacy TypeScript source compatibility and passing the complete release
+  matrix.
 - Replaced the internal Verdaccio `@stackline/xlsx@1.0.0` tarball with the
   public-ready `1.0.0` tarball after removing the old Verdaccio-only metadata.
-- Confirmed Verdaccio `latest` points to `1.0.5` after the maintenance
+- Confirmed Verdaccio `latest` points to `1.0.6` after the compatibility
   release.
 - Staged alexandro.net docs at:
 
@@ -128,8 +131,8 @@ https://github.com/alexandroit/sheetjs/tree/github
 
 ## Current Round
 
-- Current focus: publish `@stackline/xlsx@1.0.6` as the compatibility-preserving
-  `latest` release after Verdaccio and GitHub validation.
+- Current focus: `@stackline/xlsx@1.0.6` is the compatibility-preserving
+  `latest` release on Verdaccio and the official npm registry.
 - `1.0.6` restores the legacy `any` declarations for `writeFile`,
   `writeFileXLSX` and `writeFileAsync`; JavaScript runtime behavior remains
   unchanged.
@@ -160,6 +163,23 @@ https://github.com/alexandroit/sheetjs/tree/github
     surfaces and identical tested workbook behavior
 - The Makefile version extraction now parses `package.json` structurally. A
   package contract test prevents package, CommonJS and ESM version drift.
+- `1.0.6` GitHub and registry validation:
+  - principal branch candidate commit: `bfaec4b`
+  - all GitHub Actions passed: Node `20.x`, `22.x`, `24.x`, `26.x`; Deno
+    `1.46.3` / `2.9.5` with and without codepage; Bun; TypeScript compatibility;
+    pretest/posttest; build/dist/audit/pack
+  - Verdaccio direct package and npm alias smoke tests: passed
+  - official npm direct package and npm alias smoke tests: passed in CommonJS
+    and ESM
+  - browser consumer at `/storage/data/github/tests/xlsx-verdaccio-live`:
+    smoke and Vite production build passed
+  - consumer audits: `0 vulnerabilities`
+  - Verdaccio and official npm tarballs have the same SHA-1:
+    `d457cf76c6369c8c4235aae0984f78987ce2d792`
+  - public docs synchronized to
+    `https://alexandro.net/docs/vanilla/xlsx/`, returning HTTP 200 with version
+    `1.0.6` and the release compatibility policy
+  - GitHub release tag: `v1.0.6`
 - Maintenance review performed on August 9, 2026:
   - SheetJS CE `v0.20.3` remains the newest official upstream tag.
   - Untagged upstream `master` changes were reviewed without performing a
