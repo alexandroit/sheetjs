@@ -44,6 +44,27 @@ npm pack --dry-run
 - Update `README.md` or `CHANGELOG.md` for user-facing changes.
 - Confirm whether the change affects TypeScript definitions.
 
+## Versioning and compatibility
+
+Public runtime behavior and TypeScript declarations both follow semantic
+versioning. Release scope is determined before changing the package version:
+
+- Patch releases fix defects, harden security or widen compatibility without
+  removing APIs, narrowing accepted inputs or changing default behavior.
+- Minor releases add public capabilities or incorporate broad upstream
+  functional changes that require a larger compatibility review.
+- Major releases may intentionally break runtime behavior, declarations,
+  supported environments or documented APIs.
+
+Changing a return or parameter type can break a consuming build even when the
+JavaScript runtime is unchanged. Declaration changes therefore require the same
+compatibility review as runtime changes. Broad upstream merges must not be
+published as patch releases.
+
+An older release is not deprecated based only on download share. Deprecation
+requires a concrete security or compatibility reason, migration guidance and a
+documented maintainer decision.
+
 ## Security fixes
 
 Security reports should follow `SECURITY.md`. Do not publish exploit details in

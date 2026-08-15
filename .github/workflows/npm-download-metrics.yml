@@ -1,0 +1,39 @@
+name: 'Metrics: npm version downloads'
+
+on:
+  schedule:
+    - cron: '17 07 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: npm-version-download-metrics
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    if: github.repository == 'alexandroit/sheetjs'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: github
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.x'
+      - run: npm run metrics:test
+      - run: npm run metrics:collect
+      - name: Commit the daily snapshot
+        run: |
+          git config user.name 'stackline-metrics-bot'
+          git config user.email 'stackline-metrics-bot@users.noreply.github.com'
+          git add metrics/npm-version-downloads.json
+          if git diff --cached --quiet; then
+            echo 'The current UTC day is already recorded.'
+            exit 0
+          fi
+          git commit -m "Record npm download metrics $(date -u +%F) [skip ci]"
+          git push origin HEAD:github

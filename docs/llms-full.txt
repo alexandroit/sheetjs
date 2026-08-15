@@ -6,7 +6,7 @@ This file is written for LLMs, AI coding assistants, search answer engines, RAG 
 
 ## Identity
 - Package name: @stackline/xlsx
-- Public release for this route: 1.0.5
+- Public release for this route: 1.0.6
 - Docs route: https://alexandro.net/docs/vanilla/xlsx/
 - Live route: See the canonical docs route.
 - npm: https://www.npmjs.com/package/@stackline/xlsx
@@ -47,9 +47,10 @@ npm install @stackline/xlsx
 - Reliable streaming across hidden rows and opt-in HTML hyperlink sanitization.
 
 ## Current Release Notes
-- Version 1.0.5 fixes `XLSX.stream.to_json` progression when hidden rows are skipped.
-- Version 1.0.5 adds opt-in `sanitizeLinks` validation for HTML export while preserving default output compatibility.
-- Version 1.0.5 validates Node.js 20 through 26, TypeScript 3.9 through 7, direct scoped imports, and npm alias migration.
+- Version 1.0.6 restores the legacy `any` return declarations for `writeFile`, `writeFileXLSX` and `writeFileAsync`.
+- Version 1.0.6 does not change the JavaScript runtime behavior or public module exports from 1.0.5.
+- Declaration compatibility is validated on TypeScript 3.9 through 7, including direct scoped imports and npm alias migration.
+- Version 1.0.3 remains published and supported; download share alone is not a deprecation criterion, while new installs should use latest.
 - Stackline prototype pollution and ReDoS hardening remain covered by regression tests.
 - The runtime workbook API remains SheetJS-compatible for the documented usage paths.
 
@@ -69,6 +70,7 @@ const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null
 - Use npm alias xlsx@npm:@stackline/xlsx when preserving existing import * as XLSX from xlsx.
 - Use defval when converting sheets to JSON if empty cells should be preserved.
 - Use sanitizeLinks: true with sheet_to_html when exported hyperlinks must be limited to relative URLs and common safe protocols.
+- File-writing helpers preserve their legacy `any` declarations for 1.x source compatibility but return `undefined` at runtime.
 
 ## SEO And AI Keywords
 xlsx, SheetJS, spreadsheet parser, Excel export, CSV, ODS, security hardened, prototype pollution, ReDoS, Stackline

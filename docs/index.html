@@ -6,7 +6,7 @@
     <title>@stackline/xlsx Documentation</title>
     <meta
       name="description"
-      content="Public documentation for @stackline/xlsx 1.0.5, a maintained SheetJS-compatible spreadsheet parser and writer with security hardening."
+      content="Public documentation for @stackline/xlsx 1.0.6, a maintained SheetJS-compatible spreadsheet parser and writer with security hardening."
     />
     <meta
       name="keywords"
@@ -70,7 +70,7 @@
       <section class="summary">
         <div>
           <strong>Version</strong>
-          <span>1.0.5</span>
+          <span>1.0.6</span>
         </div>
         <div>
           <strong>API target</strong>
@@ -196,7 +196,7 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
           <h2>Public release checklist.</h2>
         </div>
         <ul class="checklist">
-          <li>Published as <code>@stackline/xlsx@1.0.5</code> on npm.</li>
+          <li>Published as <code>@stackline/xlsx@1.0.6</code> on npm.</li>
           <li>Run <code>npm ci</code>.</li>
           <li>Run <code>npm test</code>.</li>
           <li>Run <code>npm run build</code>.</li>
@@ -208,30 +208,40 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
 
       <section class="section">
         <div class="section-heading">
-          <p class="eyebrow">1.0.5 compatibility maintenance</p>
-          <h2>Reliable streams and safer HTML export without API breakage.</h2>
+          <p class="eyebrow">1.0.6 compatibility patch</p>
+          <h2>TypeScript source compatibility with no runtime changes.</h2>
         </div>
         <div class="feature-grid">
           <article>
-            <h3>Reliable streams</h3>
+            <h3>Legacy declarations</h3>
             <p>
-              Hidden rows now advance correctly in
-              <code>XLSX.stream.to_json</code>, preventing stalled streams while
-              preserving visible-row output.
+              <code>writeFile</code>, <code>writeFileXLSX</code> and
+              <code>writeFileAsync</code> preserve their established
+              <code>any</code> return declarations throughout the 1.x line.
             </p>
           </article>
           <article>
-            <h3>Opt-in link sanitization</h3>
+            <h3>Runtime unchanged</h3>
             <p>
-              Set <code>sanitizeLinks: true</code> for bounded HTML hyperlink
-              validation. The default remains compatible with existing output.
+              Parsing, writing, module entrypoints and runtime exports are
+              unchanged from 1.0.5. The file helpers still return
+              <code>undefined</code> at runtime.
             </p>
           </article>
           <article>
-            <h3>Broad compatibility</h3>
+            <h3>Release discipline</h3>
             <p>
-              CI covers Node.js 20 through 26 and TypeScript 3.9 through 7,
-              including direct scoped imports and npm alias migration.
+              Public declarations now follow the same SemVer policy as runtime
+              APIs, and npm adoption is recorded daily for evidence-based
+              maintenance decisions.
+            </p>
+          </article>
+          <article>
+            <h3>Existing 1.x releases</h3>
+            <p>
+              Version 1.0.3 remains published and supported. Download share is
+              monitored, but is not used by itself to deprecate a release;
+              new installations should use <code>latest</code>.
             </p>
           </article>
         </div>

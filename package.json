@@ -1,6 +1,6 @@
 {
 	"name": "@stackline/xlsx",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"author": "sheetjs",
 	"description": "SheetJS-compatible spreadsheet parser and writer with Stackline security hardening",
 	"keywords": [
@@ -137,14 +137,17 @@
 		"url": "git+https://github.com/alexandroit/sheetjs.git"
 	},
 	"scripts": {
-		"pretest": "npm run lint",
+		"pretest": "npm run lint && npm run metrics:test && npm run package:contract",
 		"test": "npm run tests-only",
 		"pretest-only": "git submodule init && git submodule update",
 		"tests-only": "make travis",
 		"build": "make",
 		"lint": "make fullint",
 		"dtslint": "tsc -p types/tsconfig.json",
-		"types-compat": "bash misc/typescript-compat.sh"
+		"types-compat": "bash misc/typescript-compat.sh",
+		"metrics:test": "node --test misc/npm-version-downloads.test.mjs",
+		"metrics:collect": "node misc/npm-version-downloads.mjs",
+		"package:contract": "node --test misc/package-contract.test.mjs"
 	},
 	"config": {
 		"blanket": {

@@ -74,6 +74,12 @@ const out = StacklineXLSX.write(wb, { bookType, type: 'array' });
 const safeHtml = StacklineXLSX.utils.sheet_to_html(ws, { sanitizeLinks: true });
 const safeHtmlBook = StacklineXLSX.write(wb, { bookType: 'html', type: 'string', sanitizeLinks: true });
 
+type IsAny<T> = 0 extends (1 & T) ? true : false;
+type Assert<T extends true> = T;
+type WriteFileReturnIsAny = Assert<IsAny<ReturnType<typeof StacklineXLSX.writeFile>>>;
+type WriteFileXLSXReturnIsAny = Assert<IsAny<ReturnType<typeof StacklineXLSX.writeFileXLSX>>>;
+type WriteFileAsyncReturnIsAny = Assert<IsAny<ReturnType<typeof StacklineXLSX.writeFileAsync>>>;
+
 if(value !== 42 || !out || !safeHtml || !safeHtmlBook) throw new Error('TypeScript compatibility smoke failed');
 TS
 

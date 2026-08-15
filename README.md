@@ -14,7 +14,7 @@
 **[Issues](https://github.com/alexandroit/sheetjs/issues)** |
 **[Repository](https://github.com/alexandroit/sheetjs)**
 
-**Current package version:** `1.0.5`
+**Current package version:** `1.0.6`
 
 ---
 
@@ -31,7 +31,7 @@ including Angular applications that currently depend on `xlsx`.
 
 | Item | Value |
 | :--- | :--- |
-| Package | `@stackline/xlsx@1.0.5` |
+| Package | `@stackline/xlsx@1.0.6` |
 | API target | `xlsx@0.20.3` |
 | Runtime dependencies | none |
 | Supported Node.js | `>=20` |
@@ -157,6 +157,23 @@ const html = XLSX.utils.sheet_to_html(worksheet, {
 ## API Surface
 
 The public utility names are preserved for existing consumers.
+
+The legacy `any` return declarations for `writeFile`, `writeFileXLSX` and
+`writeFileAsync` are preserved throughout the `1.x` line for TypeScript source
+compatibility. These functions return `undefined` at runtime; applications
+should use them for their side effects rather than depend on a return value.
+
+## Release Metrics
+
+The repository records the npm per-version `last-week` view once per UTC day.
+The history is stored in
+[`metrics/npm-version-downloads.json`](metrics/npm-version-downloads.json) and
+is intended for adoption trends, not as a count of unique users.
+
+Published `1.0.x` versions remain available and supported under the security
+policy. Download share alone is not a reason to deprecate an older release;
+new installations should still use the unpinned command above to receive the
+maintained `latest` version.
 
 | Utility | Purpose |
 | :--- | :--- |

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "package": "@stackline/xlsx",
+  "sources": {
+    "versions": "https://api.npmjs.org/versions/%40stackline%2Fxlsx/last-week"
+  },
+  "snapshots": [
+    {
+      "captureDate": "2026-08-15",
+      "capturedAt": "2026-08-15T17:05:35.812Z",
+      "period": "last-week",
+      "total": 9023,
+      "versions": [
+        {
+          "version": "1.0.3",
+          "downloads": 5929
+        },
+        {
+          "version": "1.0.4",
+          "downloads": 2407
+        },
+        {
+          "version": "1.0.2",
+          "downloads": 342
+        },
+        {
+          "version": "1.0.5",
+          "downloads": 335
+        },
+        {
+          "version": "1.0.1",
+          "downloads": 5
+        },
+        {
+          "version": "1.0.0",
+          "downloads": 5
+        }
+      ]
+    }
+  ]
+}

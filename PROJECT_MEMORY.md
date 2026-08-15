@@ -41,7 +41,7 @@ import * as XLSX from 'xlsx';
 - GitHub origin: `https://github.com/alexandroit/sheetjs.git`
 - Working branch: `github`
 - Base: SheetJS Community Edition `v0.20.3`
-- Current package version: `1.0.5`
+- Current package version: `1.0.6` release candidate
 - Verdaccio `latest`: `1.0.5`
 - Official npm `latest`: `1.0.5`
 - Package name: `@stackline/xlsx`
@@ -128,8 +128,38 @@ https://github.com/alexandroit/sheetjs/tree/github
 
 ## Current Round
 
-- Current focus: `@stackline/xlsx@1.0.5` is the validated `latest` release on
-  Verdaccio and the official npm registry.
+- Current focus: publish `@stackline/xlsx@1.0.6` as the compatibility-preserving
+  `latest` release after Verdaccio and GitHub validation.
+- `1.0.6` restores the legacy `any` declarations for `writeFile`,
+  `writeFileXLSX` and `writeFileAsync`; JavaScript runtime behavior remains
+  unchanged.
+- Keep `1.0.3` published and supported. Download share alone is not a reason to
+  deprecate an older release; new installations should use `latest`.
+- Type declarations are public API under SemVer. Broad upstream functional
+  merges require a minor release, while a patch must preserve behavior and
+  source compatibility.
+- Daily npm per-version snapshots are collected from the npm downloads API in
+  `metrics/npm-version-downloads.json` by
+  `.github/workflows/npm-download-metrics.yml`.
+- The August 15, 2026 snapshot reported `9,023` downloads in npm's
+  `last-week` per-version view: `1.0.3` had `5,929`, `1.0.4` had `2,407`,
+  `1.0.2` had `342`, `1.0.5` had `335`, and `1.0.0` / `1.0.1` had `5` each.
+  This is an adoption signal, not a unique-user count.
+- `1.0.6` local release-candidate validation:
+  - `npm test`: `74691 passing`, `2 pending`
+  - targeted security regressions: `12 passing`
+  - TypeScript `3.9.10`, `4.2.4`, `4.9.5`, `5.0.4`, `5.9.3`, `6.0.3` and
+    `7.0.2`: passed, including assertions that all three restored returns are
+    exactly `any`
+  - Deno `1.46.3` and `2.9.5`, with and without codepage: passed
+  - Bun `1.3.14`: `502 passed`, `1 skipped`, `0 failed`
+  - `npm run build`, `make dist`, `npm run dtslint`, `npm audit` and
+    `npm pack --dry-run`: passed
+  - local tarball CommonJS and ESM round-trip: passed
+  - `1.0.5` versus `1.0.6` runtime comparison: identical CJS and ESM export
+    surfaces and identical tested workbook behavior
+- The Makefile version extraction now parses `package.json` structurally. A
+  package contract test prevents package, CommonJS and ESM version drift.
 - Maintenance review performed on August 9, 2026:
   - SheetJS CE `v0.20.3` remains the newest official upstream tag.
   - Untagged upstream `master` changes were reviewed without performing a

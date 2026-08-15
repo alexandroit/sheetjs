@@ -46,7 +46,7 @@ $(ESMJSTGT): $(ESMJSDEPS)
 	cat $^ | tr -d '\15\32' > $@
 
 bits/01_version.js: package.json
-	echo "$(ULIB).version = '"`grep version package.json | awk '{gsub(/[^0-9a-z\.-]/,"",$$2); print $$2}'`"';" > $@
+	echo "$(ULIB).version = '"`node -p 'require("./package.json").version'`"';" > $@
 
 #bits/18_cfb.js: node_modules/cfb/xlscfb.flow.js
 #	cp $^ $@
