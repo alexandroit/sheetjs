@@ -144,6 +144,42 @@
           "downloads": 3
         }
       ]
+    },
+    {
+      "captureDate": "2026-08-19",
+      "capturedAt": "2026-08-19T07:54:11.586Z",
+      "period": "last-week",
+      "total": 6979,
+      "versions": [
+        {
+          "version": "1.0.3",
+          "downloads": 4056
+        },
+        {
+          "version": "1.0.4",
+          "downloads": 2118
+        },
+        {
+          "version": "1.0.5",
+          "downloads": 320
+        },
+        {
+          "version": "1.0.2",
+          "downloads": 286
+        },
+        {
+          "version": "1.0.6",
+          "downloads": 193
+        },
+        {
+          "version": "1.0.1",
+          "downloads": 3
+        },
+        {
+          "version": "1.0.0",
+          "downloads": 3
+        }
+      ]
     }
   ]
 }
