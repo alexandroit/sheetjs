@@ -48,6 +48,9 @@ import * as XLSX from 'xlsx';
 - Current security scope:
   - GHSA-4r6h-8v6p-xvw6 / CVE-2023-30533
   - GHSA-5pgg-2g8v-p4x9 / CVE-2024-22363
+- GitHub Private Vulnerability Reporting: enabled on 2026-08-22.
+- Private report URL:
+  `https://github.com/alexandroit/sheetjs/security/advisories/new`
 
 ## Completed Work
 
@@ -59,6 +62,9 @@ import * as XLSX from 'xlsx';
 - Regenerated root bundles and dist bundles.
 - Reworked README in the Stackline package documentation style.
 - Added public `CONTRIBUTING.md` and `SECURITY.md`.
+- Expanded `SECURITY.md` with a direct private-reporting channel, supported
+  version policy, response targets, scope, privacy rules, existing advisories,
+  and coordinated disclosure expectations.
 - Added public static docs in `docs/` for
   `https://alexandro.net/docs/vanilla/xlsx/`.
 - Added `package-lock.json` for reproducible development installs.
