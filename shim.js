@@ -113,7 +113,7 @@ var IE_SaveFile = (function() { try {
 'IE_GetProfileAndPath_Key = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders\\"',
 'Function IE_GetProfileAndPath(key): Set wshell = CreateObject("WScript.Shell"): IE_GetProfileAndPath = wshell.RegRead(IE_GetProfileAndPath_Key & key): IE_GetProfileAndPath = wshell.ExpandEnvironmentStrings("%USERPROFILE%") & "!" & IE_GetProfileAndPath: End Function',
 'Function IE_SaveFile_Impl(FileName, payload): Dim data, plen, i, bit: data = CStr(payload): plen = Len(data): Set fso = CreateObject("Scripting.FileSystemObject"): fso.CreateTextFile FileName, True: Set f = fso.GetFile(FileName): Set stream = f.OpenAsTextStream(2, 0): For i = 1 To plen Step 3: bit = Mid(data, i, 2): stream.write Chr(CLng("&h" & bit)): Next: stream.Close: IE_SaveFile_Impl = True: End Function',
-'|/script>'.replace("|","<")
+'\x3c/script>'
   ].join("\r\n"));
   if(typeof IE_SaveFile_Impl == "undefined") return void 0;
   var IE_GetPath = (function() {
@@ -136,7 +136,7 @@ var IE_LoadFile = (function() { try {
   if(typeof IE_LoadFile_Impl == "undefined") document.write([
 '<script type="text/vbscript" language="vbscript">',
 'Function IE_LoadFile_Impl(FileName): Dim out(), plen, i, cc: Set fso = CreateObject("Scripting.FileSystemObject"): Set f = fso.GetFile(FileName): Set stream = f.OpenAsTextStream(1, 0): plen = f.Size: ReDim out(plen): For i = 1 To plen Step 1: cc = Hex(Asc(stream.read(1))): If Len(cc) < 2 Then: cc = "0" & cc: End If: out(i) = cc: Next: IE_LoadFile_Impl = Join(out,""): End Function',
-'|/script>'.replace("|","<")
+'\x3c/script>'
   ].join("\r\n"));
   if(typeof IE_LoadFile_Impl == "undefined") return void 0;
   function fix_data(data) {

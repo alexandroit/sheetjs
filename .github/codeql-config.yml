@@ -1,0 +1,14 @@
+name: SheetJS source configuration
+
+paths-ignore:
+  - dist/**
+  - tests/**
+  - packages/**/test/**
+  - xlsx.js
+  - xlsx.mjs
+  - xlsx.flow.js
+  - xlsx.mini.js
+  - xlsx.mini.flow.js
+  - xlsx.full.min.js
+  - xlsxworker.js
+  - xlsxworker.flow.js

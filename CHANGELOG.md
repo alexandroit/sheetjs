@@ -6,6 +6,12 @@ changes may not be included if they are not expected to break existing code.
 
 ## Unreleased
 
+* Fixed Ethercalc escape decoding so encoded backslashes are decoded exactly
+  once instead of being reinterpreted as a second escape sequence.
+* Replaced ad hoc SYLK regular-expression construction with complete literal
+  escaping and removed HTML assignment from the SSF browser demo.
+* Added source-focused CodeQL analysis that excludes generated distribution
+  bundles and test fixtures while retaining checks for shipped source code.
 * Replaced vulnerable `esbuild 0.14.14` pins in auxiliary module, `otorp`, DTA,
   and bundle-metric builds with `0.28.2`.
 * Added reproducible lockfiles plus CI build and audit coverage for the nested

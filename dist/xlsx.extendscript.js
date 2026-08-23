@@ -114,7 +114,7 @@ var IE_SaveFile = (function() { try {
 'IE_GetProfileAndPath_Key = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders\\"',
 'Function IE_GetProfileAndPath(key): Set wshell = CreateObject("WScript.Shell"): IE_GetProfileAndPath = wshell.RegRead(IE_GetProfileAndPath_Key & key): IE_GetProfileAndPath = wshell.ExpandEnvironmentStrings("%USERPROFILE%") & "!" & IE_GetProfileAndPath: End Function',
 'Function IE_SaveFile_Impl(FileName, payload): Dim data, plen, i, bit: data = CStr(payload): plen = Len(data): Set fso = CreateObject("Scripting.FileSystemObject"): fso.CreateTextFile FileName, True: Set f = fso.GetFile(FileName): Set stream = f.OpenAsTextStream(2, 0): For i = 1 To plen Step 3: bit = Mid(data, i, 2): stream.write Chr(CLng("&h" & bit)): Next: stream.Close: IE_SaveFile_Impl = True: End Function',
-'|/script>'.replace("|","<")
+'\x3c/script>'
   ].join("\r\n"));
   if(typeof IE_SaveFile_Impl == "undefined") return void 0;
   var IE_GetPath = (function() {
@@ -137,7 +137,7 @@ var IE_LoadFile = (function() { try {
   if(typeof IE_LoadFile_Impl == "undefined") document.write([
 '<script type="text/vbscript" language="vbscript">',
 'Function IE_LoadFile_Impl(FileName): Dim out(), plen, i, cc: Set fso = CreateObject("Scripting.FileSystemObject"): Set f = fso.GetFile(FileName): Set stream = f.OpenAsTextStream(1, 0): plen = f.Size: ReDim out(plen): For i = 1 To plen Step 1: cc = Hex(Asc(stream.read(1))): If Len(cc) < 2 Then: cc = "0" & cc: End If: out(i) = cc: Next: IE_LoadFile_Impl = Join(out,""): End Function',
-'|/script>'.replace("|","<")
+'\x3c/script>'
   ].join("\r\n"));
   if(typeof IE_LoadFile_Impl == "undefined") return void 0;
   function fix_data(data) {
@@ -8511,13 +8511,11 @@ var SYLK = (function() {
 		"!":161, '"':162, "#":163, "(":164, "%":165, "'":167, "H ":168,
 		"+":171, ";":187, "<":188, "=":189, ">":190, "?":191, "{":223
 	});
-	var sylk_char_regex = new RegExp("\u001BN(" + keys(sylk_escapes).join("|").replace(/\|\|\|/, "|\\||").replace(/([?()+])/g,"\\$1").replace("{", "\\{") + "|\\|)", "gm");
-	try {
-		sylk_char_regex = new RegExp("\u001BN(" + keys(sylk_escapes).join("|").replace(/\|\|\|/, "|\\||").replace(/([?()+])/g,"\\$1") + "|\\|)", "gm");
-	} catch(e) {}
+	var sylk_regex_escape = function(key) { return key.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&"); };
+	sylk_escapes["|"] = 254;
+	var sylk_char_regex = new RegExp("\u001BN(" + keys(sylk_escapes).map(sylk_regex_escape).join("|") + ")", "gm");
 	var sylk_char_fn = function(_, $1){ var o = sylk_escapes[$1]; return typeof o == "number" ? _getansi(o) : o; };
 	var decode_sylk_char = function($$, $1, $2) { var newcc = (($1.charCodeAt(0) - 0x20)<<4) | ($2.charCodeAt(0) - 0x30); return newcc == 59 ? $$ : _getansi(newcc); };
-	sylk_escapes["|"] = 254;
 	/* TODO: evert the escape map */
 	var encode_sylk_str = function($$) { return $$.replace(/\n/g, "\x1b :").replace(/\r/g, "\x1b ="); };
 	/* https://oss.sheetjs.com/notes/sylk/ for more details */
@@ -8904,7 +8902,8 @@ var DIF = (function() {
 })();
 
 var ETH = (function() {
-	function decode(s) { return s.replace(/\\b/g,"\\").replace(/\\c/g,":").replace(/\\n/g,"\n"); }
+	var eth_escapes = {b:"\\", c:":", n:"\n"};
+	function decode(s) { return s.replace(/\\([bcn])/g, function(_, c) { return eth_escapes[c]; }); }
 	function encode(s) { return s.replace(/\\/g, "\\b").replace(/:/g, "\\c").replace(/\n/g,"\\n"); }
 
 	function eth_to_aoa(str, opts) {
@@ -9238,7 +9237,6 @@ function read_wb_ID(d, opts) {
 		return PRN.to_workbook(d, opts);
 	}
 }
-
 var WK_ = (function() {
 	function lotushopper(data, cb, opts) {
 		if(!data) return;

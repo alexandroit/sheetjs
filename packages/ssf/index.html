@@ -34,13 +34,18 @@ var V = document.getElementById('val');
 var N = document.getElementById('num');
 var T = document.getElementById('txt');
 
+function setText(target, value) {
+	if('textContent' in target) target.textContent = String(value);
+	else target.innerText = String(value);
+}
+
 function update() {
 	try {
-		N.innerHTML = SSF.format(F.value, Number(V.value));
-	} catch(e) { N.innerHTML = e; }
+		setText(N, SSF.format(F.value, Number(V.value)));
+	} catch(e) { setText(N, e); }
 	try {
-		T.innerHTML = SSF.format(F.value, V.value);
-	} catch(e) { T.innerHTML = e; }
+		setText(T, SSF.format(F.value, V.value));
+	} catch(e) { setText(T, e); }
 }
 
 /* Bind to relevant events */

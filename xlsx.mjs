@@ -8440,13 +8440,11 @@ var SYLK = /*#__PURE__*/(function() {
 		"!":161, '"':162, "#":163, "(":164, "%":165, "'":167, "H ":168,
 		"+":171, ";":187, "<":188, "=":189, ">":190, "?":191, "{":223
 	}/*:any*/);
-	var sylk_char_regex = new RegExp("\u001BN(" + keys(sylk_escapes).join("|").replace(/\|\|\|/, "|\\||").replace(/([?()+])/g,"\\$1").replace("{", "\\{") + "|\\|)", "gm");
-	try {
-		sylk_char_regex = new RegExp("\u001BN(" + keys(sylk_escapes).join("|").replace(/\|\|\|/, "|\\||").replace(/([?()+])/g,"\\$1") + "|\\|)", "gm");
-	} catch(e) {}
+	var sylk_regex_escape = function(key) { return key.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&"); };
+	sylk_escapes["|"] = 254;
+	var sylk_char_regex = new RegExp("\u001BN(" + keys(sylk_escapes).map(sylk_regex_escape).join("|") + ")", "gm");
 	var sylk_char_fn = function(_, $1){ var o = sylk_escapes[$1]; return typeof o == "number" ? _getansi(o) : o; };
 	var decode_sylk_char = function($$, $1, $2) { var newcc = (($1.charCodeAt(0) - 0x20)<<4) | ($2.charCodeAt(0) - 0x30); return newcc == 59 ? $$ : _getansi(newcc); };
-	sylk_escapes["|"] = 254;
 	/* TODO: evert the escape map */
 	var encode_sylk_str = function($$) { return $$.replace(/\n/g, "\x1b :").replace(/\r/g, "\x1b ="); };
 	/* https://oss.sheetjs.com/notes/sylk/ for more details */
@@ -8833,7 +8831,8 @@ var DIF = /*#__PURE__*/(function() {
 })();
 
 var ETH = /*#__PURE__*/(function() {
-	function decode(s/*:string*/)/*:string*/ { return s.replace(/\\b/g,"\\").replace(/\\c/g,":").replace(/\\n/g,"\n"); }
+	var eth_escapes = {b:"\\", c:":", n:"\n"};
+	function decode(s/*:string*/)/*:string*/ { return s.replace(/\\([bcn])/g, function(_, c) { return eth_escapes[c]; }); }
 	function encode(s/*:string*/)/*:string*/ { return s.replace(/\\/g, "\\b").replace(/:/g, "\\c").replace(/\n/g,"\\n"); }
 
 	function eth_to_aoa(str/*:string*/, opts)/*:AOA*/ {
@@ -9167,7 +9166,6 @@ function read_wb_ID(d, opts) {
 		return PRN.to_workbook(d, opts);
 	}
 }
-
 var WK_ = /*#__PURE__*/(function() {
 	function lotushopper(data, cb/*:RecordHopperCB*/, opts/*:any*/) {
 		if(!data) return;

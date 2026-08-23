@@ -60,6 +60,17 @@ import * as XLSX from 'xlsx';
   workbook parsing paths and JSON conversion helpers.
 - Added security regression tests.
 - Regenerated root bundles and dist bundles.
+- On 2026-08-23, triaged the first complete CodeQL baseline. Generated bundles
+  and test fixtures are excluded from duplicate source analysis; canonical
+  parser sources remain in scope.
+- Fixed Ethercalc escape decoding to prevent a decoded backslash from being
+  interpreted as a second escape, and added CommonJS and ESM regressions.
+- Replaced the SYLK dynamic regex construction with complete literal escaping,
+  removed HTML sinks from the SSF browser demo, and regenerated all shipped
+  bundles.
+- Validated that round with pretest, zero runtime audit findings, dry-run pack,
+  reproducible dist build, and the fixture-backed suite: 74,693 passing and 2
+  pending.
 - Reworked README in the Stackline package documentation style.
 - Added public `CONTRIBUTING.md` and `SECURITY.md`.
 - Expanded `SECURITY.md` with a direct private-reporting channel, supported
@@ -139,6 +150,9 @@ https://github.com/alexandroit/sheetjs/tree/github
 
 - Current focus: `@stackline/xlsx@1.0.6` is the compatibility-preserving
   `latest` release on Verdaccio and the official npm registry.
+- The 2026-08-23 hardening changes are committed only after GitHub CodeQL and
+  the complete compatibility matrix pass. They do not authorize an npm or
+  Verdaccio publication and do not change the current package version.
 - `1.0.6` restores the legacy `any` declarations for `writeFile`,
   `writeFileXLSX` and `writeFileAsync`; JavaScript runtime behavior remains
   unchanged.

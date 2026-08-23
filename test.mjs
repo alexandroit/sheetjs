@@ -1987,6 +1987,16 @@ describe('invalid files', function() {
 	});
 });
 
+describe('security regressions', function() {
+	it('should decode Ethercalc escapes exactly once', function() {
+		var ws = X.utils.aoa_to_sheet([["\\c", "\\n", "\\b"]]);
+		var wb = X.utils.book_new(ws, "Sheet1");
+		var data = X.write(wb, {type:"string", bookType:"eth"});
+		var parsed = X.read(data, {type:"string"});
+		assert.deepEqual(X.utils.sheet_to_json(parsed.Sheets.Sheet1, {header:1}), [["\\c", "\\n", "\\b"]]);
+	});
+});
+
 
 describe('json output', function() {
 	function seeker(json, keys, val) {
