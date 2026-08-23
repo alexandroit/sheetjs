@@ -2,6 +2,9 @@ name: 'Tests: Bun'
 
 on: [pull_request, push]
 
+permissions:
+  contents: read
+
 jobs:
   # misc test
   misc:

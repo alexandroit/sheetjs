@@ -3,6 +3,9 @@ name: 'Tests: node.js (io.js)'
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   matrix:
     runs-on: ubuntu-latest

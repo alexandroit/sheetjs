@@ -2,6 +2,9 @@ name: 'Tests: Deno'
 
 on: [pull_request, push]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: '${{ matrix.label }}'
