@@ -6,14 +6,14 @@ ENTRIES=$(subst .ts,.js,$(TSFILES))
 all: $(ENTRIES)
 
 index.node.js: index.node.ts $(LIBFILES)
-	npx esbuild@0.14.14 $< --bundle --outfile=$@ --platform=node --format=cjs
+	npx esbuild@0.28.2 $< --bundle --outfile=$@ --platform=node --format=cjs
 
 %.node.js: %.node.ts $(LIBFILES)
-	npx esbuild@0.14.14 $< --bundle --external:./ --outfile=$@ --platform=node
-	sed -i '' 's/ts-node/node/g' $@
+	npx esbuild@0.28.2 $< --bundle --external:./ --outfile=$@ --platform=node
+	sed -i.bak 's/ts-node/node/g' $@ && rm -f $@.bak
 
 %.js: %.ts $(LIBFILES)
-	npx esbuild@0.14.14 $< --bundle --outfile=$@ --platform=browser --format=iife --global-name=$* --target=es5
+	npx esbuild@0.28.2 $< --bundle --outfile=$@ --platform=browser --format=iife --global-name=$* --target=es2015
 
 .PHONY: clean
 clean:

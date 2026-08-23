@@ -4,6 +4,20 @@ This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.
 
+## Unreleased
+
+* Replaced vulnerable `esbuild 0.14.14` pins in auxiliary module, `otorp`, DTA,
+  and bundle-metric builds with `0.28.2`.
+* Added reproducible lockfiles plus CI build and audit coverage for the nested
+  module and `otorp` toolchains. CI tests the regenerated output and release
+  builds reproduce the same path. The public `@stackline/xlsx` API is unchanged.
+* Reordered existing `types` export conditions ahead of runtime conditions so
+  modern resolvers select the declarations without changing any export path.
+* Made auxiliary generated-file rewrites portable across GNU and BSD `sed` so
+  the new Linux CI build matches local macOS builds.
+* Limited the `otorp` release build contract to its two published Node files;
+  its optional browser target now declares the attainable ES2015 baseline.
+
 ## v1.0.6
 
 * Restored the legacy `any` return declarations for `writeFile`,

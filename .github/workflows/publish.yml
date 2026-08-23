@@ -36,10 +36,18 @@ jobs:
       - run: npm ci
       - run: bash misc/install-rooster.sh
       - run: make init
+      - name: Build and audit auxiliary TypeScript tools
+        run: |
+          npm ci --prefix modules
+          npm audit --prefix modules --audit-level=low
+          npm run build --prefix modules
+          npm ci --prefix packages/otorp
+          npm audit --prefix packages/otorp --audit-level=low
+          npm run build --prefix packages/otorp
+          npm run build
       - run: npm run pretest
       - run: npm run tests-only
       - run: npm run types-compat
-      - run: npm run build
       - run: PATH="$PWD/node_modules/.bin:$PATH" make dist
       - name: Reject an existing public version
         shell: bash

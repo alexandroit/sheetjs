@@ -113,7 +113,7 @@ BYTEFILER=dist/xlsx.extendscript.js
 bytes: ## Display minified and gzipped file sizes
 	@for i in $(BYTEFILEC); do npx printj "%-30s %7d %10d" $$i $$(wc -c < $$i) $$(gzip --best --stdout $$i | wc -c); done
 	@for i in $(BYTEFILER); do npx printj "%-30s %7d" $$i $$(wc -c < $$i); done
-	@npx printj "%-30s         %10d" "treeshake" "$$(npx -y esbuild@0.14.14 --bundle misc/import.js | wc -c)"
+	@npx printj "%-30s         %10d" "treeshake" "$$(npx -y esbuild@0.28.2 --bundle misc/import.js | wc -c)"
 
 
 .PHONY: git

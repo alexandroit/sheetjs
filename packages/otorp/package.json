@@ -10,14 +10,14 @@
 	"dependencies": {
 	},
 	"devDependencies": {
-		"esbuild": "0.14.14"
+		"esbuild": "0.28.2"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/SheetJS/sheetjs.git"
 	},
 	"scripts": {
-		"build": "make"
+		"build": "make -B index.node.js dump_macho_proto_defs.node.js"
 	},
 	"homepage": "https://sheetjs.com/",
 	"files": ["index.node.js", "dump_macho_proto_defs.node.js", "LICENSE", "README.md"],

@@ -22,6 +22,16 @@ jobs:
       - run: bash misc/install-rooster.sh
       - run: make init
       - run: 'echo "Using pinned test_files.zip fixtures; skipping optional live fixture refresh"'
+      - name: Rebuild with the audited auxiliary toolchains
+        if: matrix.node-version == '24.x'
+        run: |
+          npm ci --prefix modules
+          npm audit --prefix modules --audit-level=low
+          npm run build --prefix modules
+          npm ci --prefix packages/otorp
+          npm audit --prefix packages/otorp --audit-level=low
+          npm run build --prefix packages/otorp
+          npm run build
       - run: npm run tests-only
 
   package:
@@ -36,6 +46,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm audit
+      - name: Build and audit auxiliary TypeScript tools
+        run: |
+          npm ci --prefix modules
+          npm audit --prefix modules --audit-level=low
+          npm run build --prefix modules
+          npm ci --prefix packages/otorp
+          npm audit --prefix packages/otorp --audit-level=low
+          npm run build --prefix packages/otorp
       - run: npm run build
       - run: PATH="$PWD/node_modules/.bin:$PATH" make dist
       - run: npm pack --dry-run

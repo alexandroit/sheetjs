@@ -2,7 +2,7 @@ LIBFILES=src/types.ts
 #LIBFILES=$(wildcard src/*.ts)
 TSFILES=$(wildcard *.ts)
 ENTRIES=$(subst .ts,.js,$(TSFILES))
-CC=esbuild@0.14.14
+CC=esbuild@0.28.2
 
 BAREJS=04_base64.js 32_odmanrdf.js 45_rtf.js 51_xlsxmeta.js 51_xlsbmeta.js 59_vba.js 64_ftab.js 83_numbers.js
 
@@ -24,7 +24,7 @@ $(BAREJS): %.js: %.ts $(LIBFILES)
 
 %.node.js: %.node.ts $(LIBFILES) src/numbers.ts
 	npx $(CC) $< --bundle --external:xlsx --outfile=$@ --platform=node
-	sed -i '' 's/ts-node/node/g' $@ || sed -i'' 's/ts-node/node/g' $@ || { echo "sed failed"; exit 1; }
+	sed -i.bak 's/ts-node/node/g' $@ && rm -f $@.bak
 
 %.js: %.ts $(LIBFILES)
 	npx $(CC) $< --bundle --outfile=$@ --platform=browser --format=iife --global-name=$* --target=es5

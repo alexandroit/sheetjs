@@ -1,5 +1,11 @@
 {
+	"name": "@stackline/xlsx-build-modules",
+	"private": true,
+	"scripts": {
+		"build": "make -B bits"
+	},
 	"devDependencies": {
-		"esbuild": "0.14.14"
+		"cfb": "1.2.2",
+		"esbuild": "0.28.2"
 	}
 }
