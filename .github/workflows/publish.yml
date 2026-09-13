@@ -31,9 +31,12 @@ jobs:
           node-version: 24.15.0
           package-manager-cache: false
           registry-url: https://registry.npmjs.org
-      - name: Require the default branch
-        run: test "$GITHUB_REF" = "refs/heads/github"
+      - name: Require the matching release tag
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          test "$GITHUB_REF" = "refs/tags/v$version"
       - run: npm ci
+      - run: npm audit --audit-level=high
       - run: bash misc/install-rooster.sh
       - run: make init
       - run: npm run pretest
@@ -77,4 +80,4 @@ jobs:
           name: npm-release
           path: artifact/
           if-no-files-found: error
-      - run: npm publish artifact/*.tgz --access public --provenance --registry=https://registry.npmjs.org
+      - run: npm publish ./artifact/*.tgz --access public --provenance --registry=https://registry.npmjs.org

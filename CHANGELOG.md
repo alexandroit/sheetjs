@@ -4,6 +4,13 @@ This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.
 
+## v1.0.7
+
+* Updated the development-only `js-yaml` dependency from 4.3.1 to 4.3.2 to
+  address GHSA-2883-xcg3-v3hh. It is used by the test tooling and is not a
+  runtime dependency of the published package.
+* Runtime behavior, public APIs and TypeScript declarations are unchanged.
+
 ## v1.0.6
 
 * Restored the legacy `any` return declarations for `writeFile`,
