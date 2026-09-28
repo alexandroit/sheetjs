@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 /*! sheetjs (C) 2013-present SheetJS -- http://sheetjs.com */
-import { read } from 'cfb';
+import { read } from '@stackline/cfb';
 import { utils } from 'xlsx';
 import { parse_numbers_iwa } from './src/numbers';
 

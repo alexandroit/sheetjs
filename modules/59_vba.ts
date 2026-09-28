@@ -1,4 +1,4 @@
-import * as CFBModule from 'cfb';
+import * as CFBModule from '@stackline/cfb';
 type CFBType = typeof CFBModule;
 declare var CFB: CFBType;
 

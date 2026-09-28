@@ -1,7 +1,6 @@
 function parse_xlmeta_xml(data, name, opts) {
   var out = { Types: [], Cell: [], Value: [] };
-  if (!data)
-    return out;
+  if (!data) return out;
   var pass = false;
   var metatype = 2;
   var lastmeta;
@@ -10,69 +9,73 @@ function parse_xlmeta_xml(data, name, opts) {
     switch (strip_ns(y[0])) {
       case "<?xml":
         break;
+      /* 18.9.8 */
       case "<metadata":
       case "</metadata>":
         break;
+      /* 18.9.11 */
       case "<metadataTypes":
       case "</metadataTypes>":
         break;
+      /* 18.9.10 */
       case "<metadataType":
         out.Types.push({ name: y.name });
         break;
       case "</metadataType>":
         break;
+      /* 18.9.4 */
       case "<futureMetadata":
-        for (var j = 0; j < out.Types.length; ++j)
-          if (out.Types[j].name == y.name)
-            lastmeta = out.Types[j];
+        for (var j = 0; j < out.Types.length; ++j) if (out.Types[j].name == y.name) lastmeta = out.Types[j];
         break;
       case "</futureMetadata>":
         break;
+      /* 18.9.1 */
       case "<bk>":
         break;
       case "</bk>":
         break;
+      /* 18.9.15 */
       case "<rc":
-        if (metatype == 1)
-          out.Cell.push({ type: out.Types[y.t - 1].name, index: +y.v });
-        else if (metatype == 0)
-          out.Value.push({ type: out.Types[y.t - 1].name, index: +y.v });
+        if (metatype == 1) out.Cell.push({ type: out.Types[y.t - 1].name, index: +y.v });
+        else if (metatype == 0) out.Value.push({ type: out.Types[y.t - 1].name, index: +y.v });
         break;
       case "</rc>":
         break;
+      /* 18.9.3 */
       case "<cellMetadata":
         metatype = 1;
         break;
       case "</cellMetadata>":
         metatype = 2;
         break;
+      /* 18.9.17 */
       case "<valueMetadata":
         metatype = 0;
         break;
       case "</valueMetadata>":
         metatype = 2;
         break;
+      /* 18.2.10 extLst CT_ExtensionList ? */
       case "<extLst":
       case "<extLst>":
       case "</extLst>":
       case "<extLst/>":
         break;
+      /* 18.2.7  ext CT_Extension + */
       case "<ext":
         pass = true;
         break;
+      //TODO: check with versions of excel
       case "</ext>":
         pass = false;
         break;
       case "<rvb":
-        if (!lastmeta)
-          break;
-        if (!lastmeta.offsets)
-          lastmeta.offsets = [];
+        if (!lastmeta) break;
+        if (!lastmeta.offsets) lastmeta.offsets = [];
         lastmeta.offsets.push(+y.i);
         break;
       default:
-        if (!pass && (opts == null ? void 0 : opts.WTF))
-          throw new Error("unrecognized " + y[0] + " in metadata");
+        if (!pass && (opts == null ? void 0 : opts.WTF)) throw new Error("unrecognized " + y[0] + " in metadata");
     }
     return x;
   });

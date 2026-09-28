@@ -107,12 +107,15 @@ function crc32_str(str/*:string*/, seed/*:number*/)/*:number*/ {
 	var C = seed ^ -1;
 	for(var i = 0, L = str.length, c = 0, d = 0; i < L;) {
 		c = str.charCodeAt(i++);
+		/* Match UTF-8 encoders: replace unpaired UTF-16 surrogates with U+FFFD. */
+		if(c >= 0xD800 && c < 0xE000 &&
+			!(c < 0xDC00 && i < L && (d = str.charCodeAt(i)) >= 0xDC00 && d < 0xE000)) c = 0xFFFD;
 		if(c < 0x80) {
 			C = (C>>>8) ^ T0[(C^c)&0xFF];
 		} else if(c < 0x800) {
 			C = (C>>>8) ^ T0[(C ^ (192|((c>>6)&31)))&0xFF];
 			C = (C>>>8) ^ T0[(C ^ (128|(c&63)))&0xFF];
-		} else if(c >= 0xD800 && c < 0xE000) {
+		} else if(c >= 0xD800 && c < 0xDC00) {
 			c = (c&1023)+64; d = str.charCodeAt(i++)&1023;
 			C = (C>>>8) ^ T0[(C ^ (240|((c>>8)&7)))&0xFF];
 			C = (C>>>8) ^ T0[(C ^ (128|((c>>2)&63)))&0xFF];
@@ -452,6 +455,7 @@ function get_sector_list(sectors/*:Array<RawBytes>*/, start/*:number*/, fat_addr
 	if(!chkd) chkd = [];
 	var modulus = ssz - 1, j = 0, jj = 0;
 	for(j=start; j>=0;) {
+		if(chkd[j]) throw new Error("Cycle detected in FAT chain at sector " + j);
 		chkd[j] = true;
 		buf[buf.length] = j;
 		buf_chain.push(sectors[j]);

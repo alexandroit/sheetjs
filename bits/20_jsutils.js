@@ -160,7 +160,7 @@ function cc2str(arr/*:Array<number>*/, debomit)/*:string*/ {
 function dup(o/*:any*/)/*:any*/ {
 	if(typeof o != 'object' || o == null) return o;
 	if(o instanceof Date) return new Date(o.getTime());
-	var out = {};
+	var out = Array.isArray && Array.isArray(o) ? new Array(o.length) : {};
 	for(var k in o) if(safe_has_obj(o, k)) out[k] = dup(o[k]);
 	return out;
 }

@@ -5,7 +5,7 @@
 		"build": "make -B bits"
 	},
 	"devDependencies": {
-		"cfb": "1.2.2",
-		"esbuild": "0.28.2"
+		"esbuild": "0.28.2",
+		"@stackline/cfb": "1.0.0"
 	}
 }

@@ -9,11 +9,14 @@ permissions:
 jobs:
   _:
     name: "Automatic Rebase"
+    if: ${{ !startsWith(github.event.pull_request.head.ref, 'release/') }}
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        fetch-depth: 0
     - uses: ljharb/rebase@c6bd0a72b14dfaf76ad6a070029c8b4592d03eea
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

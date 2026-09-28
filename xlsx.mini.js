@@ -4,7 +4,7 @@
 /*global global, exports, module, require:false, process:false, Buffer:false, ArrayBuffer:false, DataView:false, Deno:false, Set:false, Float32Array:false */
 var XLSX = {};
 function make_xlsx_lib(XLSX){
-XLSX.version = '1.0.6';
+XLSX.version = '1.0.8';
 var current_codepage = 1200, current_ansi = 1252;
 /*global cptable:true, window */
 var $cptable;
@@ -113,16 +113,13 @@ function Base64_encode_pass(input) {
   var c1 = 0, c2 = 0, c3 = 0, e1 = 0, e2 = 0, e3 = 0, e4 = 0;
   for (var i = 0; i < input.length; ) {
     c1 = input.charCodeAt(i++);
-    if (c1 > 255)
-      c1 = 95;
+    if (c1 > 255) c1 = 95;
     e1 = c1 >> 2;
     c2 = input.charCodeAt(i++);
-    if (c2 > 255)
-      c2 = 95;
+    if (c2 > 255) c2 = 95;
     e2 = (c1 & 3) << 4 | c2 >> 4;
     c3 = input.charCodeAt(i++);
-    if (c3 > 255)
-      c3 = 95;
+    if (c3 > 255) c3 = 95;
     e3 = (c2 & 15) << 2 | c3 >> 6;
     e4 = c3 & 63;
     if (isNaN(c2)) {
@@ -158,9 +155,8 @@ function Base64_decode(input) {
   var o = "";
   var c1 = 0, c2 = 0, c3 = 0, e1 = 0, e2 = 0, e3 = 0, e4 = 0;
   if (input.slice(0, 5) == "data:") {
-    var dataidx = input.slice(0, 1024).indexOf(";base64,");
-    if (dataidx > -1)
-      input = input.slice(dataidx + 8);
+    var i = input.slice(0, 1024).indexOf(";base64,");
+    if (i > -1) input = input.slice(i + 8);
   }
   input = input.replace(/[^\w\+\/\=]/g, "");
   for (var i = 0; i < input.length; ) {
@@ -1053,6 +1049,7 @@ function eval_fmt(fmt, v, opts, flen) {
 			/* Numbers */
 			case '.':
 				if(dt != null) {
+					if(fmt.charAt(i+1) !== '0') { out[out.length] = {t:'t', v:'.'}; ++i; break; }
 					o = c; while(++i < fmt.length && (c=fmt.charAt(i)) === "0") o += c;
 					out[out.length] = {t:'s', v:o}; break;
 				}
@@ -1458,12 +1455,15 @@ function crc32_str(str, seed) {
 	var C = seed ^ -1;
 	for(var i = 0, L = str.length, c = 0, d = 0; i < L;) {
 		c = str.charCodeAt(i++);
+		/* Match UTF-8 encoders: replace unpaired UTF-16 surrogates with U+FFFD. */
+		if(c >= 0xD800 && c < 0xE000 &&
+			!(c < 0xDC00 && i < L && (d = str.charCodeAt(i)) >= 0xDC00 && d < 0xE000)) c = 0xFFFD;
 		if(c < 0x80) {
 			C = (C>>>8) ^ T0[(C^c)&0xFF];
 		} else if(c < 0x800) {
 			C = (C>>>8) ^ T0[(C ^ (192|((c>>6)&31)))&0xFF];
 			C = (C>>>8) ^ T0[(C ^ (128|(c&63)))&0xFF];
-		} else if(c >= 0xD800 && c < 0xE000) {
+		} else if(c >= 0xD800 && c < 0xDC00) {
 			c = (c&1023)+64; d = str.charCodeAt(i++)&1023;
 			C = (C>>>8) ^ T0[(C ^ (240|((c>>8)&7)))&0xFF];
 			C = (C>>>8) ^ T0[(C ^ (128|((c>>2)&63)))&0xFF];
@@ -1803,6 +1803,7 @@ function get_sector_list(sectors, start, fat_addrs, ssz, chkd) {
 	if(!chkd) chkd = [];
 	var modulus = ssz - 1, j = 0, jj = 0;
 	for(j=start; j>=0;) {
+		if(chkd[j]) throw new Error("Cycle detected in FAT chain at sector " + j);
 		chkd[j] = true;
 		buf[buf.length] = j;
 		buf_chain.push(sectors[j]);
@@ -3450,7 +3451,7 @@ function cc2str(arr, debomit) {
 function dup(o) {
 	if(typeof o != 'object' || o == null) return o;
 	if(o instanceof Date) return new Date(o.getTime());
-	var out = {};
+	var out = Array.isArray && Array.isArray(o) ? new Array(o.length) : {};
 	for(var k in o) if(safe_has_obj(o, k)) out[k] = dup(o[k]);
 	return out;
 }
@@ -5409,31 +5410,31 @@ function parse_manifest(d, opts) {
   var str = xlml_normalize(d);
   var Rn;
   var FEtag;
-  while (Rn = xlmlregex.exec(str))
-    switch (Rn[3]) {
-      case "manifest":
-        break;
-      case "file-entry":
-        FEtag = parsexmltag(Rn[0], false);
-        if (FEtag.path == "/" && FEtag.type !== CT_ODS)
-          throw new Error("This OpenDocument is not a spreadsheet");
-        break;
-      case "encryption-data":
-      case "algorithm":
-      case "start-key-generation":
-      case "key-derivation":
-        throw new Error("Unsupported ODS Encryption");
-      default:
-        if (opts && opts.WTF)
-          throw Rn;
-    }
+  while (Rn = xlmlregex.exec(str)) switch (Rn[3]) {
+    case "manifest":
+      break;
+    // 4.2 <manifest:manifest>
+    case "file-entry":
+      FEtag = parsexmltag(Rn[0], false);
+      if (FEtag.path == "/" && FEtag.type !== CT_ODS) throw new Error("This OpenDocument is not a spreadsheet");
+      break;
+    case "encryption-data":
+    // 4.4 <manifest:encryption-data>
+    case "algorithm":
+    // 4.5 <manifest:algorithm>
+    case "start-key-generation":
+    // 4.6 <manifest:start-key-generation>
+    case "key-derivation":
+      throw new Error("Unsupported ODS Encryption");
+    default:
+      if (opts && opts.WTF) throw Rn;
+  }
 }
 function write_manifest(manifest) {
   var o = [XML_HEADER];
   o.push('<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2">\n');
   o.push('  <manifest:file-entry manifest:full-path="/" manifest:version="1.2" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet"/>\n');
-  for (var i = 0; i < manifest.length; ++i)
-    o.push('  <manifest:file-entry manifest:full-path="' + manifest[i][0] + '" manifest:media-type="' + manifest[i][1] + '"/>\n');
+  for (var i = 0; i < manifest.length; ++i) o.push('  <manifest:file-entry manifest:full-path="' + manifest[i][0] + '" manifest:media-type="' + manifest[i][1] + '"/>\n');
   o.push("</manifest:manifest>");
   return o.join("");
 }
@@ -7921,8 +7922,7 @@ function write_theme(Themes, opts) {
 }
 function parse_xlmeta_xml(data, name, opts) {
   var out = { Types: [], Cell: [], Value: [] };
-  if (!data)
-    return out;
+  if (!data) return out;
   var pass = false;
   var metatype = 2;
   var lastmeta;
@@ -7931,69 +7931,73 @@ function parse_xlmeta_xml(data, name, opts) {
     switch (strip_ns(y[0])) {
       case "<?xml":
         break;
+      /* 18.9.8 */
       case "<metadata":
       case "</metadata>":
         break;
+      /* 18.9.11 */
       case "<metadataTypes":
       case "</metadataTypes>":
         break;
+      /* 18.9.10 */
       case "<metadataType":
         out.Types.push({ name: y.name });
         break;
       case "</metadataType>":
         break;
+      /* 18.9.4 */
       case "<futureMetadata":
-        for (var j = 0; j < out.Types.length; ++j)
-          if (out.Types[j].name == y.name)
-            lastmeta = out.Types[j];
+        for (var j = 0; j < out.Types.length; ++j) if (out.Types[j].name == y.name) lastmeta = out.Types[j];
         break;
       case "</futureMetadata>":
         break;
+      /* 18.9.1 */
       case "<bk>":
         break;
       case "</bk>":
         break;
+      /* 18.9.15 */
       case "<rc":
-        if (metatype == 1)
-          out.Cell.push({ type: out.Types[y.t - 1].name, index: +y.v });
-        else if (metatype == 0)
-          out.Value.push({ type: out.Types[y.t - 1].name, index: +y.v });
+        if (metatype == 1) out.Cell.push({ type: out.Types[y.t - 1].name, index: +y.v });
+        else if (metatype == 0) out.Value.push({ type: out.Types[y.t - 1].name, index: +y.v });
         break;
       case "</rc>":
         break;
+      /* 18.9.3 */
       case "<cellMetadata":
         metatype = 1;
         break;
       case "</cellMetadata>":
         metatype = 2;
         break;
+      /* 18.9.17 */
       case "<valueMetadata":
         metatype = 0;
         break;
       case "</valueMetadata>":
         metatype = 2;
         break;
+      /* 18.2.10 extLst CT_ExtensionList ? */
       case "<extLst":
       case "<extLst>":
       case "</extLst>":
       case "<extLst/>":
         break;
+      /* 18.2.7  ext CT_Extension + */
       case "<ext":
         pass = true;
         break;
+      //TODO: check with versions of excel
       case "</ext>":
         pass = false;
         break;
       case "<rvb":
-        if (!lastmeta)
-          break;
-        if (!lastmeta.offsets)
-          lastmeta.offsets = [];
+        if (!lastmeta) break;
+        if (!lastmeta.offsets) lastmeta.offsets = [];
         lastmeta.offsets.push(+y.i);
         break;
       default:
-        if (!pass && (opts == null ? void 0 : opts.WTF))
-          throw new Error("unrecognized " + y[0] + " in metadata");
+        if (!pass && (opts == null ? void 0 : opts.WTF)) throw new Error("unrecognized " + y[0] + " in metadata");
     }
     return x;
   });
@@ -8396,8 +8400,7 @@ var CT_VBA = "application/vnd.ms-office.vbaProject";
 function make_vba_xls(cfb) {
   var newcfb = CFB.utils.cfb_new({ root: "R" });
   cfb.FullPaths.forEach(function(p, i) {
-    if (p.slice(-1) === "/" || !p.match(/_VBA_PROJECT_CUR/))
-      return;
+    if (p.slice(-1) === "/" || !p.match(/_VBA_PROJECT_CUR/)) return;
     var newpath = p.replace(/^[^\/]*/, "R").replace(/\/_VBA_PROJECT_CUR\u0000*/, "");
     CFB.utils.cfb_add(newcfb, newpath, cfb.FileIndex[i].content);
   });
@@ -8405,11 +8408,9 @@ function make_vba_xls(cfb) {
 }
 function fill_vba_xls(cfb, vba) {
   vba.FullPaths.forEach(function(p, i) {
-    if (i == 0)
-      return;
+    if (i == 0) return;
     var newpath = p.replace(/^[\/]*[^\/]*[\/]/, "/_VBA_PROJECT_CUR/");
-    if (newpath.slice(-1) !== "/")
-      CFB.utils.cfb_add(cfb, newpath, vba.FileIndex[i].content);
+    if (newpath.slice(-1) !== "/") CFB.utils.cfb_add(cfb, newpath, vba.FileIndex[i].content);
   });
 }
 var VBAFMTS = ["xlsb", "xlsm", "xlam", "biff8", "xla"];
