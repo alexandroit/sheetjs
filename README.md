@@ -168,7 +168,7 @@ should use them for their side effects rather than depend on a return value.
 
 The repository records the npm per-version `last-week` view once per UTC day.
 The history is stored in
-[`metrics/npm-version-downloads.json`](metrics/npm-version-downloads.json) and
+[`metrics/npm-version-downloads.json`](https://github.com/alexandroit/sheetjs/blob/github/metrics/npm-version-downloads.json) and
 is intended for adoption trends, not as a count of unique users.
 
 Published `1.0.x` versions remain available and supported under the security
