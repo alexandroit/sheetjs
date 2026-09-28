@@ -15,16 +15,13 @@ function rtf_to_sheet_str(str, opts) {
   var o = opts || {};
   var ws = {};
   var dense = o.dense;
-  if (dense)
-    ws["!data"] = [];
+  if (dense) ws["!data"] = [];
   var rows = str_match_ng(str, "\\trowd", "\\row");
-  if (!rows)
-    throw new Error("RTF missing table");
+  if (!rows) throw new Error("RTF missing table");
   var range = { s: { c: 0, r: 0 }, e: { c: 0, r: rows.length - 1 } };
   var row = [];
   rows.forEach(function(rowtf, R) {
-    if (dense)
-      row = ws["!data"][R] = [];
+    if (dense) row = ws["!data"][R] = [];
     var rtfre = /\\[\w\-]+\b/g;
     var last_index = 0;
     var res;
@@ -32,10 +29,8 @@ function rtf_to_sheet_str(str, opts) {
     var payload = [];
     while ((res = rtfre.exec(rowtf)) != null) {
       var data = rowtf.slice(last_index, rtfre.lastIndex - res[0].length);
-      if (data.charCodeAt(0) == 32)
-        data = data.slice(1);
-      if (data.length)
-        payload.push(data);
+      if (data.charCodeAt(0) == 32) data = data.slice(1);
+      if (data.length) payload.push(data);
       switch (res[0]) {
         case "\\cell":
           ++C;
@@ -46,18 +41,15 @@ function rtf_to_sheet_str(str, opts) {
               cell.t = "b";
             } else if (!isNaN(fuzzynum(cell.v))) {
               cell.t = "n";
-              if (o.cellText !== false)
-                cell.w = cell.v;
+              if (o.cellText !== false) cell.w = cell.v;
               cell.v = fuzzynum(cell.v);
             } else if (RBErr[cell.v] != null) {
               cell.t = "e";
               cell.w = cell.v;
               cell.v = RBErr[cell.v];
             }
-            if (dense)
-              row[C] = cell;
-            else
-              ws[encode_cell({ r: R, c: C })] = cell;
+            if (dense) row[C] = cell;
+            else ws[encode_cell({ r: R, c: C })] = cell;
           }
           payload = [];
           break;
@@ -67,8 +59,7 @@ function rtf_to_sheet_str(str, opts) {
       }
       last_index = rtfre.lastIndex;
     }
-    if (C > range.e.c)
-      range.e.c = C;
+    if (C > range.e.c) range.e.c = C;
   });
   ws["!ref"] = encode_range(range);
   return ws;
@@ -80,17 +71,14 @@ function rtf_to_workbook(d, opts) {
 }
 function sheet_to_rtf(ws, opts) {
   var o = ["{\\rtf1\\ansi"];
-  if (!ws["!ref"])
-    return o[0] + "}";
+  if (!ws["!ref"]) return o[0] + "}";
   var r = safe_decode_range(ws["!ref"]), cell;
   var dense = ws["!data"] != null, row = [];
   for (var R = r.s.r; R <= r.e.r; ++R) {
     o.push("\\trowd\\trautofit1");
-    for (var C = r.s.c; C <= r.e.c; ++C)
-      o.push("\\cellx" + (C + 1));
+    for (var C = r.s.c; C <= r.e.c; ++C) o.push("\\cellx" + (C + 1));
     o.push("\\pard\\intbl");
-    if (dense)
-      row = ws["!data"][R] || [];
+    if (dense) row = ws["!data"][R] || [];
     for (C = r.s.c; C <= r.e.c; ++C) {
       var coord = encode_cell({ r: R, c: C });
       cell = dense ? row[C] : ws[coord];

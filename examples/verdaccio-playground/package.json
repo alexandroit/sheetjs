@@ -1,0 +1,14 @@
+{
+  "name": "stackline-xlsx-local-playground",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test:node": "node run-node-checks.mjs"
+  },
+  "dependencies": {
+    "@stackline/xlsx": "1.0.8-verdaccio.1",
+    "xlsx": "npm:@stackline/xlsx@1.0.8-verdaccio.1"
+  }
+}

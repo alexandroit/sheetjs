@@ -4,8 +4,20 @@ This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.
 
-## Unreleased
+## v1.0.8
 
+* Use the maintained Stackline development dependencies directly, remove the
+  unused `word` package, and update Mocha to 12.0.2 without legacy overrides.
+* Reject repeated CFB sectors, handle unpaired UTF-16 surrogates in embedded
+  CRC-32, and preserve literal periods in SSF date formats.
+* Preserve UTF-8 encoding results across later codepage calls in both CommonJS
+  and ESM. Rebuild the browser bundles with the scoped Uglify fork.
+* Keep the public API, TypeScript declarations, and zero runtime dependencies.
+
+* Preserve negative and very small finite values in NUMBERS decimal encoding,
+  and correct signed WK3 floating-point reads and writes.
+* Preserve array-valued worksheet filters when cloning read options.
+* Add a local interactive playground and automated format regressions.
 * Fixed Ethercalc escape decoding so encoded backslashes are decoded exactly
   once instead of being reinterpreted as a second escape sequence.
 * Replaced ad hoc SYLK regular-expression construction with complete literal
@@ -23,6 +35,13 @@ changes may not be included if they are not expected to break existing code.
   the new Linux CI build matches local macOS builds.
 * Limited the `otorp` release build contract to its two published Node files;
   its optional browser target now declares the attainable ES2015 baseline.
+
+## v1.0.7
+
+* Updated the development-only `js-yaml` dependency from 4.3.1 to 4.3.2 to
+  address GHSA-2883-xcg3-v3hh. It is used by the test tooling and is not a
+  runtime dependency of the published package.
+* Runtime behavior, public APIs and TypeScript declarations are unchanged.
 
 ## v1.0.6
 

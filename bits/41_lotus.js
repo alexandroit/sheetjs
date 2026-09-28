@@ -656,8 +656,10 @@ var WK_ = /*#__PURE__*/(function() {
 			else o[1].v = 0;
 			return o;
 		}
-		var s = e & 0x8000; e = (e&0x7FFF) - 16446;
-		o[1].v = (1 - s*2) * (v2 * Math.pow(2, e+32) + v1 * Math.pow(2, e));
+		var s = e >>> 15; e = (e&0x7FFF) - 16383;
+		var v = v2 / Math.pow(2, 31) + v1 / Math.pow(2, 63);
+		/* Scale subnormal doubles in two steps to avoid premature underflow. */
+		o[1].v = (1 - s*2) * (e < -1022 ? v * Math.pow(2, e+1022) * Math.pow(2, -1022) : v * Math.pow(2, e));
 		return o;
 	}
 	function write_NUMBER_17(R, C, wsidx, v) {
@@ -673,10 +675,13 @@ var WK_ = /*#__PURE__*/(function() {
 		}
 		var s = 0, e = 0, v1 = 0, v2 = 0;
 		if(v < 0) { s = 1; v = -v; }
-		e = Math.log2(v) | 0;
-		v /= Math.pow(2, e-31);
+		/* log2 can round up at powers of two; normalize before splitting words. */
+		e = Math.min(1023, Math.floor(Math.log2(v)));
+		v /= Math.pow(2, e);
+		if(v < 1) { v *= 2; --e; }
+		else if(v >= 2) { v /= 2; ++e; }
+		v *= Math.pow(2, 31);
 		v2 = (v)>>>0;
-		if((v2&0x80000000) == 0) { v/=2; ++e; v2 = v >>> 0; }
 		v -= v2;
 		v2 |= 0x80000000;
 		v2 >>>= 0;

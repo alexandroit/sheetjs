@@ -48,7 +48,7 @@ $(ESMJSTGT): $(ESMJSDEPS)
 bits/01_version.js: package.json
 	echo "$(ULIB).version = '"`node -p 'require("./package.json").version'`"';" > $@
 
-#bits/18_cfb.js: node_modules/cfb/xlscfb.flow.js
+#bits/18_cfb.js: node_modules/@stackline/cfb/xlscfb.flow.js
 #	cp $^ $@
 
 $(TSBITS): bits/%: modules/%
@@ -102,7 +102,7 @@ dist: dist-deps $(TARGET) bower.json ## Prepare JS files for distribution
 .PHONY: dist-deps
 dist-deps: ## Copy dependencies for distribution
 	mkdir -p dist
-	cp node_modules/codepage/dist/cpexcel.full.js dist/cpexcel.js
+	cp node_modules/@stackline/codepage/dist/cpexcel.full.js dist/cpexcel.js
 
 .PHONY: aux
 aux: $(AUXTARGETS)
@@ -147,7 +147,7 @@ testdot: test.js ## Run test suite using dot reporter
 
 .PHONY: test-esm
 test-esm: test.mjs ## Run Node ESM test suite
-	npx -y mocha@9 -R spec -t 30000 $<
+	./node_modules/.bin/mocha -R spec -t 30000 $<
 
 test.ts: test.mts
 	node -pe 'var data = fs.readFileSync("'$<'", "utf8"); data.split("\n").map(function(l) { return l.replace(/^describe\((.*?)function\(\)/, "Deno.test($$1async function(t)").replace(/\b(?:it|describe)\((.*?)function\(\)/g, "await t.step($$1async function(t)").replace("assert.ok", "assert.assert"); }).join("\n")' > $@
@@ -248,11 +248,11 @@ $(COVFMT): cov_%:
 	FMTS=$* make cov
 
 misc/coverage.html: $(TARGET) test.js
-	mocha --require blanket -R html-cov -t 30000 > $@
+	mocha --require @stackline/blanket -R html-cov -t 30000 > $@
 
 .PHONY: coveralls
 coveralls: ## Coverage Test + Send to coveralls.io
-	mocha --require blanket --reporter mocha-lcov-reporter -t 30000 | node ./node_modules/coveralls/bin/coveralls.js
+	mocha --require @stackline/blanket --reporter mocha-lcov-reporter -t 30000 | node ./node_modules/coveralls/bin/coveralls.js
 
 MDLINT=README.md
 .PHONY: mdlint

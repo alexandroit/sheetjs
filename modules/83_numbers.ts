@@ -2,7 +2,7 @@
 /// <reference path="src/types.ts"/>
 
 /* these are type imports and do not show up in the generated JS */
-import { CFB$Container, CFB$Entry } from 'cfb';
+import { CFB$Container, CFB$Entry } from '@stackline/cfb';
 import { WorkBook, WorkSheet, Range, CellObject, ParsingOptions, WritingOptions, DenseWorkSheet, Comments } from '../';
 import type { utils, NumberFormat } from "../";
 
@@ -15,7 +15,7 @@ declare var decode_range: typeof utils.decode_range;
 declare var numdate: (num: number) => Date;
 declare var table_fmt: {[nf: number]: string};
 declare function fmt_is_date(fmt: NumberFormat): boolean;
-import * as _CFB from 'cfb';
+import * as _CFB from '@stackline/cfb';
 declare var CFB: typeof _CFB;
 //<<import { utils } from "../../";
 //<<const { encode_col, encode_row, encode_range, book_new, book_append_sheet } = utils;
@@ -70,13 +70,18 @@ function readDecimal128LE(buf: Uint8Array, offset: number): number {
 	var exp = ((buf[offset + 15] & 0x7F) << 7) | (buf[offset + 14] >> 1);
 	var mantissa = buf[offset + 14] & 1;
 	for(var j = offset + 13; j >= offset; --j) mantissa = mantissa * 256 + buf[j];
-	return ((buf[offset+15] & 0x80) ? -mantissa : mantissa) * Math.pow(10, exp - 0x1820);
+	mantissa = (buf[offset+15] & 0x80) ? -mantissa : mantissa;
+	// Split the scale for tiny values so the decimal power does not underflow.
+	return exp - 0x1820 < -308 ? mantissa * Math.pow(10, exp - 0x1820 + 300) * 1e-300 : mantissa * Math.pow(10, exp - 0x1820);
 }
 /** Write a 128-bit decimal to the modern cell storage */
 function writeDecimal128LE(buf: Uint8Array, offset: number, value: number): void {
 	// TODO: something more correct than this
 	var exp = Math.floor(value == 0 ? 0 : /*Math.log10*/Math.LOG10E * Math.log(Math.abs(value))) + 0x1820 - 16;
-	var mantissa = (value / Math.pow(10, exp - 0x1820));
+	// The sign is stored separately from the unsigned decimal mantissa.
+	var magnitude = Math.abs(value);
+	// Avoid division by an underflowed power (which would leave the loop at Infinity).
+	var mantissa = exp - 0x1820 < -308 ? magnitude * 1e300 / Math.pow(10, exp - 0x1820 + 300) : magnitude / Math.pow(10, exp - 0x1820);
 	buf[offset+15] |= exp >> 7;
 	buf[offset+14] |= (exp & 0x7F) << 1;
 	for(var i = 0; mantissa >= 1; ++i, mantissa /= 256) buf[offset + i] = mantissa & 0xFF;

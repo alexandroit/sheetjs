@@ -24,16 +24,13 @@ function Base64_encode_pass(input) {
   var c1 = 0, c2 = 0, c3 = 0, e1 = 0, e2 = 0, e3 = 0, e4 = 0;
   for (var i = 0; i < input.length; ) {
     c1 = input.charCodeAt(i++);
-    if (c1 > 255)
-      c1 = 95;
+    if (c1 > 255) c1 = 95;
     e1 = c1 >> 2;
     c2 = input.charCodeAt(i++);
-    if (c2 > 255)
-      c2 = 95;
+    if (c2 > 255) c2 = 95;
     e2 = (c1 & 3) << 4 | c2 >> 4;
     c3 = input.charCodeAt(i++);
-    if (c3 > 255)
-      c3 = 95;
+    if (c3 > 255) c3 = 95;
     e3 = (c2 & 15) << 2 | c3 >> 6;
     e4 = c3 & 63;
     if (isNaN(c2)) {
@@ -69,9 +66,8 @@ function Base64_decode(input) {
   var o = "";
   var c1 = 0, c2 = 0, c3 = 0, e1 = 0, e2 = 0, e3 = 0, e4 = 0;
   if (input.slice(0, 5) == "data:") {
-    var dataidx = input.slice(0, 1024).indexOf(";base64,");
-    if (dataidx > -1)
-      input = input.slice(dataidx + 8);
+    var i = input.slice(0, 1024).indexOf(";base64,");
+    if (i > -1) input = input.slice(i + 8);
   }
   input = input.replace(/[^\w\+\/\=]/g, "");
   for (var i = 0; i < input.length; ) {

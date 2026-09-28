@@ -8,7 +8,7 @@
     "test": "node smoke-direct.cjs && node smoke-alias.cjs && node smoke-esm.mjs"
   },
   "dependencies": {
-    "@stackline/xlsx": "latest",
-    "xlsx": "npm:@stackline/xlsx@latest"
+    "@stackline/xlsx": "1.0.8-verdaccio.1",
+    "xlsx": "npm:@stackline/xlsx@1.0.8-verdaccio.1"
   }
 }

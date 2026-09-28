@@ -15,8 +15,7 @@ function write_BrtMdtinfo(data) {
 function parse_BrtMdb(data) {
   var out = [];
   var cnt = data.read_shift(4);
-  while (cnt-- > 0)
-    out.push([data.read_shift(4), data.read_shift(4)]);
+  while (cnt-- > 0) out.push([data.read_shift(4), data.read_shift(4)]);
   return out;
 }
 function write_BrtMdb(mdb) {
@@ -52,15 +51,25 @@ function parse_xlmeta_bin(data, name, _opts) {
   var metatype = 2;
   recordhopper(data, function(val, R, RT) {
     switch (RT) {
+      // case 0x014C: /* BrtBeginMetadata */
+      // case 0x014D: /* BrtEndMetadata */
+      // case 0x014E: /* BrtBeginEsmdtinfo */
+      // case 0x0150: /* BrtEndEsmdtinfo */
+      // case 0x0153: /* BrtBeginEsfmd */
+      // case 0x0154: /* BrtEndEsfmd */
+      // case 0x0034: /* BrtBeginFmd */
+      // case 0x0035: /* BrtEndFmd */
+      // case 0x1000: /* BrtBeginDynamicArrayPr */
+      // case 0x1001: /* BrtEndDynamicArrayPr */
+      // case 0x138A: /* BrtBeginRichValueBlock */
+      // case 0x138B: /* BrtEndRichValueBlock */
       case 335:
         out.Types.push({ name: val.name });
         break;
       case 51:
         val.forEach(function(r) {
-          if (metatype == 1)
-            out.Cell.push({ type: out.Types[r[0] - 1].name, index: r[1] });
-          else if (metatype == 0)
-            out.Value.push({ type: out.Types[r[0] - 1].name, index: r[1] });
+          if (metatype == 1) out.Cell.push({ type: out.Types[r[0] - 1].name, index: r[1] });
+          else if (metatype == 0) out.Value.push({ type: out.Types[r[0] - 1].name, index: r[1] });
         });
         break;
       case 337:
@@ -79,33 +88,64 @@ function parse_xlmeta_bin(data, name, _opts) {
         break;
       default:
         if (R.T) {
-        } else if (!pass || opts.WTF && state[state.length - 1] != 35)
-          throw new Error("Unexpected record 0x" + RT.toString(16));
+        } else if (!pass || opts.WTF && state[state.length - 1] != 35) throw new Error("Unexpected record 0x" + RT.toString(16));
     }
   });
   return out;
 }
 function write_xlmeta_bin() {
   var ba = buf_array();
-  write_record(ba, 332);
+  write_record(
+    ba,
+    332
+    /* BrtBeginMetadata */
+  );
   write_record(ba, 334, write_UInt32LE(1));
   write_record(ba, 335, write_BrtMdtinfo({
     name: "XLDAPR",
     version: 12e4,
     flags: 3496657072
   }));
-  write_record(ba, 336);
+  write_record(
+    ba,
+    336
+    /* BrtEndEsmdtinfo */
+  );
   write_record(ba, 339, write_BrtBeginEsfmd(1, "XLDAPR"));
-  write_record(ba, 52);
+  write_record(
+    ba,
+    52
+    /* BrtBeginFmd */
+  );
   write_record(ba, 35, write_UInt32LE(514));
   write_record(ba, 4096, write_UInt32LE(0));
   write_record(ba, 4097, writeuint16(1));
-  write_record(ba, 36);
-  write_record(ba, 53);
-  write_record(ba, 340);
+  write_record(
+    ba,
+    36
+    /* BrtFRTEnd */
+  );
+  write_record(
+    ba,
+    53
+    /* BrtEndFmd */
+  );
+  write_record(
+    ba,
+    340
+    /* BrtEndEsfmd */
+  );
   write_record(ba, 337, write_BrtBeginEsmdb(1, true));
   write_record(ba, 51, write_BrtMdb([[1, 0]]));
-  write_record(ba, 338);
-  write_record(ba, 333);
+  write_record(
+    ba,
+    338
+    /* BrtEndEsmdb */
+  );
+  write_record(
+    ba,
+    333
+    /* BrtEndMetadata */
+  );
   return ba.end();
 }

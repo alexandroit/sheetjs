@@ -879,255 +879,506 @@ var Ftab = {
 };
 var FtabArgc = {
   2: 1,
+  /* ISNA */
   3: 1,
+  /* ISERROR */
   10: 0,
+  /* NA */
   15: 1,
+  /* SIN */
   16: 1,
+  /* COS */
   17: 1,
+  /* TAN */
   18: 1,
+  /* ATAN */
   19: 0,
+  /* PI */
   20: 1,
+  /* SQRT */
   21: 1,
+  /* EXP */
   22: 1,
+  /* LN */
   23: 1,
+  /* LOG10 */
   24: 1,
+  /* ABS */
   25: 1,
+  /* INT */
   26: 1,
+  /* SIGN */
   27: 2,
+  /* ROUND */
   30: 2,
+  /* REPT */
   31: 3,
+  /* MID */
   32: 1,
+  /* LEN */
   33: 1,
+  /* VALUE */
   34: 0,
+  /* TRUE */
   35: 0,
+  /* FALSE */
   38: 1,
+  /* NOT */
   39: 2,
+  /* MOD */
   40: 3,
+  /* DCOUNT */
   41: 3,
+  /* DSUM */
   42: 3,
+  /* DAVERAGE */
   43: 3,
+  /* DMIN */
   44: 3,
+  /* DMAX */
   45: 3,
+  /* DSTDEV */
   47: 3,
+  /* DVAR */
   48: 2,
+  /* TEXT */
   53: 1,
+  /* GOTO */
   61: 3,
+  /* MIRR */
   63: 0,
+  /* RAND */
   65: 3,
+  /* DATE */
   66: 3,
+  /* TIME */
   67: 1,
+  /* DAY */
   68: 1,
+  /* MONTH */
   69: 1,
+  /* YEAR */
   70: 1,
+  /* WEEKDAY */
   71: 1,
+  /* HOUR */
   72: 1,
+  /* MINUTE */
   73: 1,
+  /* SECOND */
   74: 0,
+  /* NOW */
   75: 1,
+  /* AREAS */
   76: 1,
+  /* ROWS */
   77: 1,
+  /* COLUMNS */
   79: 2,
+  /* ABSREF */
   80: 2,
+  /* RELREF */
   83: 1,
+  /* TRANSPOSE */
   85: 0,
+  /* STEP */
   86: 1,
+  /* TYPE */
   89: 0,
+  /* CALLER */
   90: 1,
+  /* DEREF */
   94: 0,
+  /* ACTIVE.CELL */
   95: 0,
+  /* SELECTION */
   97: 2,
+  /* ATAN2 */
   98: 1,
+  /* ASIN */
   99: 1,
+  /* ACOS */
   101: 3,
+  /* HLOOKUP */
   102: 3,
+  /* VLOOKUP */
   105: 1,
+  /* ISREF */
   106: 1,
+  /* GET.FORMULA */
   108: 2,
+  /* SET.VALUE */
   111: 1,
+  /* CHAR */
   112: 1,
+  /* LOWER */
   113: 1,
+  /* UPPER */
   114: 1,
+  /* PROPER */
   117: 2,
+  /* EXACT */
   118: 1,
+  /* TRIM */
   119: 4,
+  /* REPLACE */
   121: 1,
+  /* CODE */
   126: 1,
+  /* ISERR */
   127: 1,
+  /* ISTEXT */
   128: 1,
+  /* ISNUMBER */
   129: 1,
+  /* ISBLANK */
   130: 1,
+  /* T */
   131: 1,
+  /* N */
   133: 1,
+  /* FCLOSE */
   134: 1,
+  /* FSIZE */
   135: 1,
+  /* FREADLN */
   136: 2,
+  /* FREAD */
   137: 2,
+  /* FWRITELN */
   138: 2,
+  /* FWRITE */
   140: 1,
+  /* DATEVALUE */
   141: 1,
+  /* TIMEVALUE */
   142: 3,
+  /* SLN */
   143: 4,
+  /* SYD */
   144: 4,
+  /* DDB */
   161: 1,
+  /* DIALOG.BOX */
   162: 1,
+  /* CLEAN */
   163: 1,
+  /* MDETERM */
   164: 1,
+  /* MINVERSE */
   165: 2,
+  /* MMULT */
   172: 1,
+  /* WHILE */
   175: 2,
+  /* INITIATE */
   176: 2,
+  /* REQUEST */
   177: 3,
+  /* POKE */
   178: 2,
+  /* EXECUTE */
   179: 1,
+  /* TERMINATE */
   184: 1,
+  /* FACT */
   186: 1,
+  /* GET.WORKSPACE */
   189: 3,
+  /* DPRODUCT */
   190: 1,
+  /* ISNONTEXT */
   195: 3,
+  /* DSTDEVP */
   196: 3,
+  /* DVARP */
   197: 1,
+  /* TRUNC */
   198: 1,
+  /* ISLOGICAL */
   199: 3,
+  /* DCOUNTA */
   201: 1,
+  /* UNREGISTER */
   207: 4,
+  /* REPLACEB */
   210: 3,
+  /* MIDB */
   211: 1,
+  /* LENB */
   212: 2,
+  /* ROUNDUP */
   213: 2,
+  /* ROUNDDOWN */
   214: 1,
+  /* ASC */
   215: 1,
+  /* DBCS */
   225: 0,
+  /* END.IF */
   229: 1,
+  /* SINH */
   230: 1,
+  /* COSH */
   231: 1,
+  /* TANH */
   232: 1,
+  /* ASINH */
   233: 1,
+  /* ACOSH */
   234: 1,
+  /* ATANH */
   235: 3,
+  /* DGET */
   244: 1,
+  /* INFO */
   247: 4,
+  /* DB */
   252: 2,
+  /* FREQUENCY */
   257: 1,
+  /* EVALUATE */
   261: 1,
+  /* ERROR.TYPE */
   271: 1,
+  /* GAMMALN */
   273: 4,
+  /* BINOMDIST */
   274: 2,
+  /* CHIDIST */
   275: 2,
+  /* CHIINV */
   276: 2,
+  /* COMBIN */
   277: 3,
+  /* CONFIDENCE */
   278: 3,
+  /* CRITBINOM */
   279: 1,
+  /* EVEN */
   280: 3,
+  /* EXPONDIST */
   281: 3,
+  /* FDIST */
   282: 3,
+  /* FINV */
   283: 1,
+  /* FISHER */
   284: 1,
+  /* FISHERINV */
   285: 2,
+  /* FLOOR */
   286: 4,
+  /* GAMMADIST */
   287: 3,
+  /* GAMMAINV */
   288: 2,
+  /* CEILING */
   289: 4,
+  /* HYPGEOMDIST */
   290: 3,
+  /* LOGNORMDIST */
   291: 3,
+  /* LOGINV */
   292: 3,
+  /* NEGBINOMDIST */
   293: 4,
+  /* NORMDIST */
   294: 1,
+  /* NORMSDIST */
   295: 3,
+  /* NORMINV */
   296: 1,
+  /* NORMSINV */
   297: 3,
+  /* STANDARDIZE */
   298: 1,
+  /* ODD */
   299: 2,
+  /* PERMUT */
   300: 3,
+  /* POISSON */
   301: 3,
+  /* TDIST */
   302: 4,
+  /* WEIBULL */
   303: 2,
+  /* SUMXMY2 */
   304: 2,
+  /* SUMX2MY2 */
   305: 2,
+  /* SUMX2PY2 */
   306: 2,
+  /* CHITEST */
   307: 2,
+  /* CORREL */
   308: 2,
+  /* COVAR */
   309: 3,
+  /* FORECAST */
   310: 2,
+  /* FTEST */
   311: 2,
+  /* INTERCEPT */
   312: 2,
+  /* PEARSON */
   313: 2,
+  /* RSQ */
   314: 2,
+  /* STEYX */
   315: 2,
+  /* SLOPE */
   316: 4,
+  /* TTEST */
   325: 2,
+  /* LARGE */
   326: 2,
+  /* SMALL */
   327: 2,
+  /* QUARTILE */
   328: 2,
+  /* PERCENTILE */
   331: 2,
+  /* TRIMMEAN */
   332: 2,
+  /* TINV */
   337: 2,
+  /* POWER */
   342: 1,
+  /* RADIANS */
   343: 1,
+  /* DEGREES */
   346: 2,
+  /* COUNTIF */
   347: 1,
+  /* COUNTBLANK */
   350: 4,
+  /* ISPMT */
   351: 3,
+  /* DATEDIF */
   352: 1,
+  /* DATESTRING */
   353: 2,
+  /* NUMBERSTRING */
   360: 1,
+  /* PHONETIC */
   368: 1,
+  /* BAHTTEXT */
   369: 1,
+  /* THAIDAYOFWEEK */
   370: 1,
+  /* THAIDIGIT */
   371: 1,
+  /* THAIMONTHOFYEAR */
   372: 1,
+  /* THAINUMSOUND */
   373: 1,
+  /* THAINUMSTRING */
   374: 1,
+  /* THAISTRINGLENGTH */
   375: 1,
+  /* ISTHAIDIGIT */
   376: 1,
+  /* ROUNDBAHTDOWN */
   377: 1,
+  /* ROUNDBAHTUP */
   378: 1,
+  /* THAIYEAR */
   382: 3,
+  /* CUBEMEMBERPROPERTY */
   385: 1,
+  /* HEX2DEC */
   392: 1,
+  /* OCT2DEC */
   393: 1,
+  /* BIN2DEC */
   396: 2,
+  /* IMSUB */
   397: 2,
+  /* IMDIV */
   398: 2,
+  /* IMPOWER */
   399: 1,
+  /* IMABS */
   400: 1,
+  /* IMSQRT */
   401: 1,
+  /* IMLN */
   402: 1,
+  /* IMLOG2 */
   403: 1,
+  /* IMLOG10 */
   404: 1,
+  /* IMSIN */
   405: 1,
+  /* IMCOS */
   406: 1,
+  /* IMEXP */
   407: 1,
+  /* IMARGUMENT */
   408: 1,
+  /* IMCONJUGATE */
   409: 1,
+  /* IMAGINARY */
   410: 1,
+  /* IMREAL */
   414: 4,
+  /* SERIESSUM */
   415: 1,
+  /* FACTDOUBLE */
   416: 1,
+  /* SQRTPI */
   417: 2,
+  /* QUOTIENT */
   420: 1,
+  /* ISEVEN */
   421: 1,
+  /* ISODD */
   422: 2,
+  /* MROUND */
   424: 1,
+  /* ERFC */
   425: 2,
+  /* BESSELJ */
   426: 2,
+  /* BESSELK */
   427: 2,
+  /* BESSELY */
   428: 2,
+  /* BESSELI */
   430: 3,
+  /* XNPV */
   438: 3,
+  /* TBILLEQ */
   439: 3,
+  /* TBILLPRICE */
   440: 3,
+  /* TBILLYIELD */
   443: 2,
+  /* DOLLARDE */
   444: 2,
+  /* DOLLARFR */
   445: 2,
+  /* NOMINAL */
   446: 2,
+  /* EFFECT */
   447: 6,
+  /* CUMPRINC */
   448: 6,
+  /* CUMIPMT */
   449: 2,
+  /* EDATE */
   450: 2,
+  /* EOMONTH */
   464: 2,
+  /* RANDBETWEEN */
   468: 3,
+  /* CONVERT */
   476: 2,
+  /* FVSCHEDULE */
   479: 1,
+  /* CUBESETCOUNT */
   480: 2,
+  /* IFERROR */
   65535: 0
 };

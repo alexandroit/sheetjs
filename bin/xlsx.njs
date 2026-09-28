@@ -4,7 +4,7 @@
 var n = "xlsx";
 var X = require('../');
 try { X = require('../xlsx.flow'); } catch(e) {}
-try { require('exit-on-epipe'); } catch(e) {}
+try { require('@stackline/exit-on-epipe'); } catch(e) {}
 var fs = require('fs'), program;
 try { program = require('commander'); } catch(e) {
 	[

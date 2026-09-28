@@ -23,7 +23,7 @@ $(BAREJS): %.js: %.ts $(LIBFILES)
 	npx $(CC) $< --outfile=$@ --platform=browser --target=es5
 
 %.node.js: %.node.ts $(LIBFILES) src/numbers.ts
-	npx $(CC) $< --bundle --external:xlsx --outfile=$@ --platform=node
+	npx $(CC) $< --bundle --external:xlsx --external:@stackline/xlsx --outfile=$@ --platform=node
 	sed -i.bak 's/ts-node/node/g' $@ && rm -f $@.bak
 
 %.js: %.ts $(LIBFILES)
