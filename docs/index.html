@@ -1,12 +1,13 @@
 <!doctype html>
 <html lang="en">
   <head>
+  <meta name="application-version" content="1.0.9">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@stackline/xlsx Documentation</title>
     <meta
       name="description"
-      content="Public documentation for @stackline/xlsx 1.0.6, a maintained SheetJS-compatible spreadsheet parser and writer with security hardening."
+      content="Public documentation for @stackline/xlsx 1.0.9, a maintained SheetJS-compatible spreadsheet parser and writer with security hardening."
     />
     <meta
       name="keywords"
@@ -70,7 +71,7 @@
       <section class="summary">
         <div>
           <strong>Version</strong>
-          <span>1.0.6</span>
+          <span>1.0.9</span>
         </div>
         <div>
           <strong>API target</strong>
@@ -91,12 +92,12 @@
           <p class="eyebrow">Install</p>
           <h2>Use the scoped package directly.</h2>
         </div>
-        <pre><code>npm install @stackline/xlsx</code></pre>
+        <pre><code>npm install @stackline/xlsx@1.0.9</code></pre>
         <p>
           Existing apps that must keep
           <code>import * as XLSX from 'xlsx'</code> can use npm alias migration.
         </p>
-        <pre><code>npm install xlsx@npm:@stackline/xlsx</code></pre>
+        <pre><code>npm install xlsx@npm:@stackline/xlsx@1.0.9</code></pre>
       </section>
 
       <section id="usage" class="section two-column">
@@ -193,16 +194,13 @@ XLSX.utils.book_append_sheet(workbook, worksheet, 'People');</code></pre>
       <section id="release" class="section">
         <div class="section-heading">
           <p class="eyebrow">Release</p>
-          <h2>Public release checklist.</h2>
+          <h2>Published release 1.0.9.</h2>
         </div>
         <ul class="checklist">
-          <li>Published as <code>@stackline/xlsx@1.0.6</code> on npm.</li>
-          <li>Run <code>npm ci</code>.</li>
-          <li>Run <code>npm test</code>.</li>
-          <li>Run <code>npm run build</code>.</li>
-          <li>Run <code>make dist</code>.</li>
-          <li>Run <code>npm pack --dry-run</code>.</li>
-          <li>Smoke test direct scoped usage and npm alias migration.</li>
+          <li>Published as <code>@stackline/xlsx@1.0.9</code> on npm.</li>
+          <li>Updated package documentation, discovery keywords and GitHub Actions publication.</li>
+          <li>Includes the 1.0.8 parsing and encoding fixes with zero runtime dependencies.</li>
+          <li><a href="https://github.com/alexandroit/sheetjs/blob/github/CHANGELOG.md">Read the complete release history.</a></li>
         </ul>
       </section>
 
