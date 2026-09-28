@@ -250,11 +250,11 @@ else if (kind === 'csv') {
     sheet = wb.Sheets[wb.SheetNames[0]];
 }
 else {
-    const parsed = new DOMParser().parseFromString(text, 'text/html'), table = parsed.querySelector('table');
-    if (!table)
+    if (!/<table(?:\s|>)/i.test(text))
         throw new Error('A entrada deve conter uma tabela HTML.');
-    table.querySelectorAll('script,style,iframe,img,link,object,embed').forEach(el => el.remove());
-    sheet = XLSX.utils.table_to_sheet(table, { raw: true });
+    // Parse HTML as workbook data without creating browser DOM resources.
+    const workbook = XLSX.read(text, { type: 'string', raw: true });
+    sheet = workbook.Sheets[workbook.SheetNames[0]];
 } XLSX.utils.book_append_sheet(state.workbook, sheet, 'Conversão', true); state.active = state.workbook.SheetNames.length - 1; state.page = 0; state.address = 'A1'; state.origin = 'Texto convertido'; renderWorkbook(); notice('Nova aba criada. Abra “Planilha” para inspecionar.'); });
 function addressUtilities() { const value = $('address-input').value.trim().toUpperCase(), range = validRange(value), start = XLSX.utils.encode_cell(range.s); $('address-output').textContent = json({ entrada: value, indicesBaseZero: range, celulaInicial: XLSX.utils.decode_cell(start), split: XLSX.utils.split_cell(start), coluna: XLSX.utils.encode_col(range.s.c), linha: XLSX.utils.encode_row(range.s.r), intervalo: XLSX.utils.encode_range(range) }); }
 action('address-run', addressUtilities);

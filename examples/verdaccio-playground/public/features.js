@@ -292,7 +292,9 @@ export async function runBrowserChecks(XLSX, codepage, onResult = () => {}, opti
     const html = utils.sheet_to_html(sheet, {sanitizeLinks: true});
     expect(!/href\s*=\s*["']javascript:/i.test(html), 'Esquema javascript permaneceu no href');
     utils.cell_set_hyperlink(sheet.A2, 'https://example.com/');
-    expect(utils.sheet_to_html(sheet, {sanitizeLinks: true}).includes('https://example.com/'), 'HTTPS removido indevidamente');
+    const safeHtml = utils.sheet_to_html(sheet, {sanitizeLinks: true});
+    const hrefs = Array.from(safeHtml.matchAll(/<a\b[^>]*\bhref="([^"]*)"/g), match => match[1]);
+    equal(hrefs, ['https://example.com/'], 'Destino HTTPS exato');
     return 'A opção filtra esquemas de links. Não é um sanitizador geral de HTML.';
   });
 
