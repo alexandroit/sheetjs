@@ -279,7 +279,7 @@ footer {
   .summary,
   .two-column,
   .feature-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .site-header {
@@ -290,6 +290,11 @@ footer {
   .hero {
     min-height: auto;
     padding-top: 2rem;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
   }
 
   .sheet-grid {
