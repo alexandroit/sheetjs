@@ -8,13 +8,14 @@
 [![license](https://img.shields.io/npm/l/@stackline/xlsx.svg?style=flat-square)](https://github.com/alexandroit/sheetjs/blob/github/LICENSE)
 [![GitHub repository](https://img.shields.io/badge/GitHub-alexandroit%2Fsheetjs-181717?style=flat-square&logo=github)](https://github.com/alexandroit/sheetjs)
 [![Docs](https://img.shields.io/badge/docs-alexandro.net-0f766e?style=flat-square)](https://alexandro.net/docs/vanilla/xlsx/)
+[![Reddit community](https://img.shields.io/badge/community-r%2FStackline-ff4500?style=flat-square&logo=reddit&logoColor=white)](https://www.reddit.com/r/Stackline/)
 
 **[Documentation](https://alexandro.net/docs/vanilla/xlsx/)** |
 **[npm](https://www.npmjs.com/package/@stackline/xlsx)** |
 **[Issues](https://github.com/alexandroit/sheetjs/issues)** |
 **[Repository](https://github.com/alexandroit/sheetjs)**
 
-**Current package version:** `1.0.8`
+**Current package version:** `1.0.9`
 
 ---
 
@@ -31,7 +32,7 @@ including Angular applications that currently depend on `xlsx`.
 
 | Item | Value |
 | :--- | :--- |
-| Package | `@stackline/xlsx@1.0.8` |
+| Package | `@stackline/xlsx@1.0.9` |
 | API target | `xlsx@0.20.3` |
 | Runtime dependencies | none |
 | Supported Node.js | `>=20` |
@@ -228,6 +229,10 @@ It validates direct scoped imports, `xlsx` alias migration and ESM usage.
 
 ## Release Checklist
 
+Publish through the [GitHub Actions workflow](https://github.com/alexandroit/sheetjs/actions/workflows/publish.yml)
+from the matching release tag. The workflow checks the reviewed tarball's
+SHA-512 digest before publishing with npm provenance.
+
 - Confirm `npm ci` succeeds.
 - Confirm `npm test` passes.
 - Confirm `npm run build` passes.
@@ -237,6 +242,17 @@ It validates direct scoped imports, `xlsx` alias migration and ESM usage.
 - Test direct `@stackline/xlsx` usage.
 - Test `xlsx@npm:@stackline/xlsx` alias usage.
 - Run `npm audit --omit=dev` in the consumer project.
+
+## Community and Links
+
+- [Stackline website](https://alexandro.net/)
+- [GitHub projects](https://github.com/alexandroit)
+- [npm packages](https://www.npmjs.com/~alex360qc)
+- [Reddit community — r/Stackline](https://www.reddit.com/r/Stackline/)
+- [Maintainer LinkedIn](https://www.linkedin.com/in/aleinfo/)
+
+Use the repository's issue tracker for reproducible bugs and feature requests.
+Join r/Stackline to share examples, ask usage questions, and discuss releases.
 
 ## License
 
