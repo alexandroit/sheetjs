@@ -1,6 +1,6 @@
 {
 	"name": "@stackline/xlsx",
-	"version": "1.0.9",
+	"version": "1.0.10",
 	"author": "sheetjs",
 	"description": "SheetJS-compatible spreadsheet parser and writer with Stackline security hardening",
 	"keywords": [
@@ -114,16 +114,16 @@
 	},
 	"sideEffects": false,
 	"devDependencies": {
-		"@stackline/adler-32": "1.0.0",
-		"@stackline/alex": "1.0.0",
-		"@stackline/blanket": "1.0.0",
-		"@stackline/cfb": "1.0.0",
-		"@stackline/codepage": "1.0.0",
-		"@stackline/crc-32": "1.0.0",
-		"@stackline/exit-on-epipe": "1.0.0",
-		"@stackline/ssf": "1.0.0",
-		"@stackline/uglify-js": "1.0.0",
-		"@stackline/wmf": "1.0.0",
+		"@stackline/adler-32": "1.0.2",
+		"@stackline/alex": "1.0.4",
+		"@stackline/blanket": "1.0.3",
+		"@stackline/cfb": "1.1.0",
+		"@stackline/codepage": "1.0.2",
+		"@stackline/crc-32": "1.0.2",
+		"@stackline/exit-on-epipe": "1.0.2",
+		"@stackline/ssf": "1.0.2",
+		"@stackline/uglify-js": "1.0.5",
+		"@stackline/wmf": "1.0.2",
 		"@types/node": "^8.5.9",
 		"acorn": "^8.17.0",
 		"commander": "~2.17.1",
@@ -202,5 +202,27 @@
 	},
 	"directories": {
 		"test": "tests"
+	},
+	"overrides": {
+		"@stackline/unified-engine": {
+			"glob": "14.0.3"
+		},
+		"@npmcli/map-workspaces": {
+			"glob": "14.0.3",
+			"minimatch": "11.0.4"
+		},
+		"@npmcli/package-json": {
+			"glob": "14.0.3"
+		},
+		"eslint": {
+			"minimatch": "11.0.4"
+		},
+		"@eslint/config-array": {
+			"minimatch": "11.0.4"
+		},
+		"mocha": {
+			"glob": "14.0.3",
+			"minimatch": "11.0.4"
+		}
 	}
 }

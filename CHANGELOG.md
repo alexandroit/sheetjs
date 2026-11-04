@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.0.10
+
+- Refresh Stackline development and build dependencies to versions already available on npm, with matching locks and rebuilt distribution files.
+- Pin supported Node.js CI versions to security releases while preserving historical compatibility lanes.
+- Verify the official spreadsheet fixture archive by SHA-256 before extraction.
+
 This log is intended to keep track of backwards-incompatible changes, including
 but not limited to API changes and file location changes.  Minor behavioral
 changes may not be included if they are not expected to break existing code.

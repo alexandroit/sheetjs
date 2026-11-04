@@ -68,8 +68,9 @@ clean-data:
 
 .PHONY: init
 init: ## Initial setup for development
+	if [ ! -e test_files.zip ]; then curl -fLO https://test-files.sheetjs.com/test_files.zip; fi
+	printf 'a786d4f1a80adf9447997b6f3b30b2593c776c27e0b075e3971627c17205f220  test_files.zip\n' | sha256sum --check --status
 	rm -rf test_files
-	if [ ! -e test_files.zip ]; then curl -LO https://test-files.sheetjs.com/test_files.zip; fi
 	unzip test_files.zip
 	mkdir -p tmp
 
