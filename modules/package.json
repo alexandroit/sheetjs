@@ -6,6 +6,6 @@
 	},
 	"devDependencies": {
 		"esbuild": "0.28.2",
-		"@stackline/cfb": "1.1.0"
+		"@stackline/cfb": "1.1.1"
 	}
 }
