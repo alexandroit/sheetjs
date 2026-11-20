@@ -4032,6 +4032,58 @@
           "downloads": 2
         }
       ]
+    },
+    {
+      "captureDate": "2026-11-20",
+      "capturedAt": "2026-11-20T16:09:19.150Z",
+      "period": "last-week",
+      "total": 21512,
+      "versions": [
+        {
+          "version": "1.0.9",
+          "downloads": 7485
+        },
+        {
+          "version": "1.0.4",
+          "downloads": 5899
+        },
+        {
+          "version": "1.0.6",
+          "downloads": 2158
+        },
+        {
+          "version": "1.0.10",
+          "downloads": 2110
+        },
+        {
+          "version": "1.0.7",
+          "downloads": 1771
+        },
+        {
+          "version": "1.0.3",
+          "downloads": 1184
+        },
+        {
+          "version": "1.0.5",
+          "downloads": 627
+        },
+        {
+          "version": "1.0.2",
+          "downloads": 270
+        },
+        {
+          "version": "1.0.1",
+          "downloads": 3
+        },
+        {
+          "version": "1.0.0",
+          "downloads": 3
+        },
+        {
+          "version": "1.0.8",
+          "downloads": 2
+        }
+      ]
     }
   ]
 }
